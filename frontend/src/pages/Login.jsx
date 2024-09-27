@@ -8,9 +8,12 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
 import { useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import { v4 as uuidv4 } from "uuid";
 
-export function Login({ isDeveloper, setDeveloper }) {
+export function Login({ isDeveloper, setDeveloper, setUser }) {
   const formRef = useRef();
+  const navigator = useNavigate();
 
   const handleDeveloperToggle = (e) => {
     e.preventDefault();
@@ -26,6 +29,15 @@ export function Login({ isDeveloper, setDeveloper }) {
     const form = formRef.current;
     console.log(`username: ${form.username.value}`);
     console.log(`role: ${form.radiogroup.value}`);
+    setUser([
+      {
+        userId: uuidv4(),
+        username: form.username.value,
+        role: form.radiogroup.value,
+      },
+    ]);
+
+    navigator("/session");
   };
 
   return (

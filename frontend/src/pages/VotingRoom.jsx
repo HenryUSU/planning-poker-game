@@ -6,8 +6,25 @@ import { Fragment, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { VoteButton } from "../components/VoteButton";
 import { AdminButtons } from "../components/AdminButtons";
+import { socket } from "../components/socket";
+import { useEffect } from "react";
 
-export function VotingRoom({ isDeveloper }) {
+export function VotingRoom({ isDeveloper, user, setUser }) {
+  useEffect(() => {
+    socket.connect();
+    //socket.emit("testEvent", "Hello from frontend");
+    console.log(`User from frontend: ${user[0].username}`);
+    socket.emit("user_joined", {
+      userId: user[0].userId,
+      username: user[0].username,
+      role: user[0].role,
+    });
+    socket.on("user_joined", (msg) => {
+      console.log(`User from backend: ${msg.user}`);
+      setvotes((prevVotes) => [...prevVotes, msg]);
+    });
+  }, []);
+
   const [votes, setvotes] = useState([
     {
       id: uuidv4(),

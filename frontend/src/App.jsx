@@ -12,6 +12,7 @@ import "@fontsource/roboto/700.css";
 
 function App() {
   const [isDeveloper, setDeveloper] = useState(true);
+  const [user, setUser] = useState([]);
   return (
     <Fragment>
       <CssBaseline>
@@ -22,19 +23,24 @@ function App() {
               element={
                 <Login
                   isDeveloper={isDeveloper}
-                  setDeveloper={setDeveloper}></Login>
+                  setDeveloper={setDeveloper}
+                  setUser={setUser}></Login>
               }></Route>
             <Route
               path="/"
               element={
                 <Login
                   isDeveloper={isDeveloper}
-                  setDeveloper={setDeveloper}></Login>
+                  setDeveloper={setDeveloper}
+                  setUser={setUser}></Login>
               }></Route>
             <Route
-              path="/session/123"
+              path="/session"
               element={
-                <VotingRoom isDeveloper={isDeveloper}></VotingRoom>
+                <VotingRoom
+                  isDeveloper={isDeveloper}
+                  user={user}
+                  setUser={setUser}></VotingRoom>
               }></Route>
           </Routes>
         </BrowserRouter>
