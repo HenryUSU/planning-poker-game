@@ -2,8 +2,51 @@ import Grid from "@mui/material/Grid2";
 import Typography from "@mui/material/Typography";
 import { Box } from "@mui/material";
 import { Votes } from "../components/Votes";
+import { Fragment, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
+import { VoteButton } from "../components/VoteButton";
+import { AdminButtons } from "../components/AdminButtons";
 
-export function VotingRoom() {
+export function VotingRoom({ isDeveloper }) {
+  const [votes, setvotes] = useState([
+    {
+      id: uuidv4(),
+      user: "Max",
+      voteResult: 2,
+    },
+    {
+      id: uuidv4(),
+      user: "Tom",
+      voteResult: 3,
+    },
+  ]);
+  const [votesShow, setVotesShow] = useState(false);
+
+  const displayVotes = votes.map((vote) => {
+    return !votesShow ? (
+      <Votes key={vote.id} user={vote.user} voteResult="?"></Votes>
+    ) : (
+      <Votes
+        key={vote.id}
+        user={vote.user}
+        voteResult={vote.voteResult}></Votes>
+    );
+  });
+
+  const calculateAverage = () => {
+    let averageVote = 0;
+    votes.forEach((vote) => {
+      if (vote.voteResult >= 0 && vote.voteResult <= 13) {
+        averageVote += vote.voteResult;
+      }
+    });
+    if (votesShow) {
+      return averageVote / votes.length;
+    } else {
+      return null;
+    }
+  };
+
   return (
     <Box>
       <Box sx={{ flexGrow: 1, height: "100vh", width: "100vw" }}>
@@ -34,10 +77,33 @@ export function VotingRoom() {
               }}>
               <Typography variant="h4">Votes</Typography>
               <Box>
-                <Votes user={"Max"} voteResult={"5"}></Votes>
+                {/* <Votes user={"Max"} voteResult={"5"}></Votes> */}
+                {displayVotes}
               </Box>
             </Box>
-            Average: 15
+            Average: {calculateAverage()}
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                flexWrap: "wrap",
+              }}>
+              {" "}
+              {isDeveloper ? (
+                <Fragment>
+                  <VoteButton value={1}></VoteButton>
+                  <VoteButton value={2}></VoteButton>
+                  <VoteButton value={3}></VoteButton>
+                  <VoteButton value={5}></VoteButton>
+                  <VoteButton value={7}></VoteButton>
+                  <VoteButton value={13}></VoteButton>
+                </Fragment>
+              ) : (
+                <AdminButtons
+                  votesShow={votesShow}
+                  setVotesShow={setVotesShow}></AdminButtons>
+              )}
+            </Box>
           </Grid>
           <Grid size={3}></Grid>
           {/* Footer */}

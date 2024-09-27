@@ -7,12 +7,10 @@ import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 
-export function Login() {
+export function Login({ isDeveloper, setDeveloper }) {
   const formRef = useRef();
-
-  const [isDeveloper, setDeveloper] = useState(true);
 
   const handleDeveloperToggle = (e) => {
     e.preventDefault();
