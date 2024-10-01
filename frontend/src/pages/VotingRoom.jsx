@@ -46,7 +46,8 @@ export function VotingRoom({ isDeveloper, user, setUser }) {
       <Votes
         key={vote.id}
         user={vote.user}
-        voteResult={vote.voteResult}></Votes>
+        voteResult={vote.voteResult}
+      ></Votes>
     );
   });
 
@@ -75,12 +76,13 @@ export function VotingRoom({ isDeveloper, user, setUser }) {
                 textAlign: "center",
               }}
               variant="h2"
-              gutterBottom>
+              gutterBottom
+            >
               Planning Poker Game
             </Typography>
           </Grid>
-          <Grid size={3}></Grid>
-          <Grid size={6}>
+          <Grid size={4}></Grid>
+          <Grid size={5}>
             <Box
               sx={{
                 display: "flex",
@@ -91,7 +93,8 @@ export function VotingRoom({ isDeveloper, user, setUser }) {
                 gap: "10px",
                 border: "1px solid black",
                 padding: "15px",
-              }}>
+              }}
+            >
               <Typography variant="h4">Votes</Typography>
               <Box>
                 {/* <Votes user={"Max"} voteResult={"5"}></Votes> */}
@@ -104,21 +107,49 @@ export function VotingRoom({ isDeveloper, user, setUser }) {
                 display: "flex",
                 flexDirection: "row",
                 flexWrap: "wrap",
-              }}>
+              }}
+            >
               {" "}
               {isDeveloper ? (
                 <Fragment>
-                  <VoteButton value={1}></VoteButton>
-                  <VoteButton value={2}></VoteButton>
-                  <VoteButton value={3}></VoteButton>
-                  <VoteButton value={5}></VoteButton>
-                  <VoteButton value={7}></VoteButton>
-                  <VoteButton value={13}></VoteButton>
+                  <VoteButton
+                    value={1}
+                    imgSource={"./svg/1_card.svg"}
+                  ></VoteButton>
+                  <VoteButton
+                    value={2}
+                    imgSource={"./svg/2_card.svg"}
+                  ></VoteButton>
+                  <VoteButton
+                    value={3}
+                    imgSource={"./svg/3_card.svg"}
+                  ></VoteButton>
+                  <VoteButton
+                    value={5}
+                    imgSource={"./svg/5_card.svg"}
+                  ></VoteButton>
+                  <VoteButton
+                    value={8}
+                    imgSource={"./svg/8_card.svg"}
+                  ></VoteButton>
+                  <VoteButton
+                    value={13}
+                    imgSource={"./svg/13_card.svg"}
+                  ></VoteButton>
+                  <VoteButton
+                    value={"?"}
+                    imgSource={"./svg/question_card.svg"}
+                  ></VoteButton>
+                  <VoteButton
+                    value={"Coffee break"}
+                    imgSource={"./svg/coffee_card.svg"}
+                  ></VoteButton>
                 </Fragment>
               ) : (
                 <AdminButtons
                   votesShow={votesShow}
-                  setVotesShow={setVotesShow}></AdminButtons>
+                  setVotesShow={setVotesShow}
+                ></AdminButtons>
               )}
             </Box>
           </Grid>

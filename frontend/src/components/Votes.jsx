@@ -7,7 +7,8 @@ export function Votes({ user, voteResult }) {
         padding: "5px",
       }}
       direction="row"
-      spacing={5}>
+      spacing={5}
+    >
       <p>{user}</p>
       <p>{voteResult}</p>
     </Stack>

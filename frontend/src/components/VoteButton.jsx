@@ -2,7 +2,7 @@ import Paper from "@mui/material/Paper";
 import { Box } from "@mui/material";
 import { blueGrey } from "@mui/material/colors";
 
-export const VoteButton = ({ value }) => {
+export const VoteButton = ({ value, imgSource }) => {
   const handleClick = () => {
     console.log(`Vote: ${value}`);
   };
@@ -14,16 +14,28 @@ export const VoteButton = ({ value }) => {
           "&:hover": {
             boxShadow: 15,
             cursor: "pointer",
+            transform: "scale(1.1, 1.1)",
           },
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          width: 128,
-          height: 256,
+          width: 153,
+          height: 228,
           m: 1,
-          backgroundColor: "#2196f3",
-        }}>
-        {value}{" "}
+          border: "1px solid black",
+          borderRadius: "5%",
+          backgroundColor: "#000000",
+        }}
+      >
+        <img
+          style={{
+            width: "100%",
+            height: "100%",
+            borderRadius: "5%",
+            objectFit: "contain",
+          }}
+          src={imgSource}
+        ></img>
       </Paper>
     </Box>
   );
