@@ -10,44 +10,75 @@ import { socket } from "../components/socket";
 import { useEffect } from "react";
 
 export function VotingRoom({ isDeveloper, user, setUser }) {
+  const sessionId = "session123";
   useEffect(() => {
     socket.connect();
     //socket.emit("testEvent", "Hello from frontend");
     console.log(`User from frontend: ${user[0].username}`);
-    socket.emit("user_joined", {
-      userId: user[0].userId,
-      username: user[0].username,
-      role: user[0].role,
-    });
-    socket.on("user_joined", (msg) => {
-      console.log(`User from backend: ${msg.user}`);
-      setvotes((prevVotes) => [...prevVotes, msg]);
-    });
-  }, []);
+    // socket.emit("user_joined", {
+    //   userId: user[0].userId,
+    //   username: user[0].username,
+    //   role: user[0].role,
+    // });
+    // socket.on("user_joined", (msg) => {
+    //   console.log(`User from backend: ${msg.user}`);
+    //   setvotes((prevVotes) => [...prevVotes, msg]);
+    // });
+    if (sessionId) {
+      socket.emit("join_room", {
+        userId: user[0].userId,
+        username: user[0].username,
+        sessionId,
+      });
+    }
 
+    // socket.on("join_room", (msg) => {
+    //   console.log(`User from backend: ${msg.user}`);
+    //   setvotes((prevVotes) => [...prevVotes, msg]);
+    //   console.log(`Votes is: ${votes}`);
+    // });
+
+    socket.on("join_room", ({ users }) => {
+      // console.log(`User from backend: ${msg.user}`);
+      setvotes(users);
+      console.log(`Votes is: ${votes[0]}`);
+    });
+
+    return () => {
+      // socket.off("user_joined");
+      socket.off("joined_room");
+    };
+  }, [user]);
+
+  // if (sessionId) {
+  //   socket.emit("join_room", {
+  //     userId: user[0].userId,
+  //     username: user[0].username,
+  //     sessionId,
+  //   });
+  // }
   const [votes, setvotes] = useState([
-    {
-      id: uuidv4(),
-      user: "Max",
-      voteResult: 2,
-    },
-    {
-      id: uuidv4(),
-      user: "Tom",
-      voteResult: 3,
-    },
+    // {
+    //   id: uuidv4(),
+    //   user: "Max",
+    //   voteResult: 2,
+    // },
+    // {
+    //   id: uuidv4(),
+    //   user: "Tom",
+    //   voteResult: 3,
+    // },
   ]);
   const [votesShow, setVotesShow] = useState(false);
 
   const displayVotes = votes.map((vote) => {
     return !votesShow ? (
-      <Votes key={vote.id} user={vote.user} voteResult="?"></Votes>
+      <Votes key={vote.userId} user={vote.username} voteResult="?"></Votes>
     ) : (
       <Votes
-        key={vote.id}
-        user={vote.user}
-        voteResult={vote.voteResult}
-      ></Votes>
+        key={vote.userId}
+        user={vote.username}
+        voteResult={vote.voteResult}></Votes>
     );
   });
 
@@ -76,8 +107,7 @@ export function VotingRoom({ isDeveloper, user, setUser }) {
                 textAlign: "center",
               }}
               variant="h2"
-              gutterBottom
-            >
+              gutterBottom>
               Planning Poker Game
             </Typography>
           </Grid>
@@ -93,8 +123,7 @@ export function VotingRoom({ isDeveloper, user, setUser }) {
                 gap: "10px",
                 border: "1px solid black",
                 padding: "15px",
-              }}
-            >
+              }}>
               <Typography variant="h4">Votes</Typography>
               <Box>
                 {/* <Votes user={"Max"} voteResult={"5"}></Votes> */}
@@ -107,49 +136,39 @@ export function VotingRoom({ isDeveloper, user, setUser }) {
                 display: "flex",
                 flexDirection: "row",
                 flexWrap: "wrap",
-              }}
-            >
+              }}>
               {" "}
               {isDeveloper ? (
                 <Fragment>
                   <VoteButton
                     value={1}
-                    imgSource={"./svg/1_card.svg"}
-                  ></VoteButton>
+                    imgSource={"./svg/1_card.svg"}></VoteButton>
                   <VoteButton
                     value={2}
-                    imgSource={"./svg/2_card.svg"}
-                  ></VoteButton>
+                    imgSource={"./svg/2_card.svg"}></VoteButton>
                   <VoteButton
                     value={3}
-                    imgSource={"./svg/3_card.svg"}
-                  ></VoteButton>
+                    imgSource={"./svg/3_card.svg"}></VoteButton>
                   <VoteButton
                     value={5}
-                    imgSource={"./svg/5_card.svg"}
-                  ></VoteButton>
+                    imgSource={"./svg/5_card.svg"}></VoteButton>
                   <VoteButton
                     value={8}
-                    imgSource={"./svg/8_card.svg"}
-                  ></VoteButton>
+                    imgSource={"./svg/8_card.svg"}></VoteButton>
                   <VoteButton
                     value={13}
-                    imgSource={"./svg/13_card.svg"}
-                  ></VoteButton>
+                    imgSource={"./svg/13_card.svg"}></VoteButton>
                   <VoteButton
                     value={"?"}
-                    imgSource={"./svg/question_card.svg"}
-                  ></VoteButton>
+                    imgSource={"./svg/question_card.svg"}></VoteButton>
                   <VoteButton
                     value={"Coffee break"}
-                    imgSource={"./svg/coffee_card.svg"}
-                  ></VoteButton>
+                    imgSource={"./svg/coffee_card.svg"}></VoteButton>
                 </Fragment>
               ) : (
                 <AdminButtons
                   votesShow={votesShow}
-                  setVotesShow={setVotesShow}
-                ></AdminButtons>
+                  setVotesShow={setVotesShow}></AdminButtons>
               )}
             </Box>
           </Grid>
