@@ -1,10 +1,17 @@
 import { Box, Button } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
+import { socket } from "../components/socket";
 
-export function AdminButtons({ votesShow, setVotesShow }) {
+export function AdminButtons({ votesShow, setVotesShow, sessionIdVar }) {
   const handleShowVotes = () => {
-    setVotesShow(true);
+    socket.emit("showVotes", { sessionId: sessionIdVar });
+    // setVotesShow(true);
+  };
+
+  const handleResetVotes = () => {
+    socket.emit("resetVote", { sessionId: sessionIdVar });
+    // setVotesShow(false);
   };
   return (
     <Box
@@ -21,7 +28,10 @@ export function AdminButtons({ votesShow, setVotesShow }) {
         startIcon={<VisibilityIcon />}>
         Show Votes
       </Button>
-      <Button variant="outlined" startIcon={<RestartAltIcon />}>
+      <Button
+        onClick={handleResetVotes}
+        variant="outlined"
+        startIcon={<RestartAltIcon />}>
         Reset Votes
       </Button>
     </Box>

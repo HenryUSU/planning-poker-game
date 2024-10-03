@@ -1,10 +1,12 @@
 import Paper from "@mui/material/Paper";
 import { Box } from "@mui/material";
-import { blueGrey } from "@mui/material/colors";
+import { socket } from "../components/socket";
 
 export const VoteButton = ({ value, imgSource }) => {
   const handleClick = () => {
     console.log(`Vote: ${value}`);
+    const localUserId = localStorage.getItem("userId");
+    socket.emit("updateVote", { userId: localUserId, voteResult: value });
   };
   return (
     <Box onClick={handleClick}>
@@ -25,8 +27,7 @@ export const VoteButton = ({ value, imgSource }) => {
           border: "1px solid black",
           borderRadius: "5%",
           backgroundColor: "#000000",
-        }}
-      >
+        }}>
         <img
           style={{
             width: "100%",
@@ -34,8 +35,7 @@ export const VoteButton = ({ value, imgSource }) => {
             borderRadius: "5%",
             objectFit: "contain",
           }}
-          src={imgSource}
-        ></img>
+          src={imgSource}></img>
       </Paper>
     </Box>
   );
