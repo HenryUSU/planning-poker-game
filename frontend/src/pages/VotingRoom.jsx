@@ -13,62 +13,39 @@ export function VotingRoom({ isDeveloper, user, setUser }) {
   const sessionId = "session123";
   useEffect(() => {
     socket.connect();
-    //socket.emit("testEvent", "Hello from frontend");
+
     console.log(`User from frontend: ${user[0].username}`);
-    // socket.emit("user_joined", {
-    //   userId: user[0].userId,
-    //   username: user[0].username,
-    //   role: user[0].role,
-    // });
-    // socket.on("user_joined", (msg) => {
-    //   console.log(`User from backend: ${msg.user}`);
-    //   setvotes((prevVotes) => [...prevVotes, msg]);
-    // });
-    if (sessionId) {
-      socket.emit("join_room", {
-        userId: user[0].userId,
-        username: user[0].username,
-        sessionId,
-      });
-    }
+    localStorage.setItem("userId", `${user[0].userId}`);
 
-    // socket.on("join_room", (msg) => {
-    //   console.log(`User from backend: ${msg.user}`);
-    //   setvotes((prevVotes) => [...prevVotes, msg]);
-    //   console.log(`Votes is: ${votes}`);
-    // });
+    socket.emit("join-room", {
+      sessionId: sessionId,
+      userId: user[0].userId,
+      username: user[0].username,
+      role: user[0].role,
+      voteResult: 0,
+    });
 
-    socket.on("join_room", ({ users }) => {
-      // console.log(`User from backend: ${msg.user}`);
+    socket.on("room-joined", ({ users }) => {
+      console.log(`Users from backend: ${JSON.stringify(users)}`);
       setvotes(users);
-      console.log(`Votes is: ${votes[0]}`);
+    });
+
+    socket.on("votesShown", () => {
+      setVotesShow(true);
+    });
+    socket.on("votesResetted", () => {
+      setVotesShow(false);
     });
 
     return () => {
-      // socket.off("user_joined");
-      socket.off("joined_room");
+      socket.off("room-joined");
+      socket.off("votesResetted");
+      socket.off("votesShown");
     };
-  }, [user]);
+  }, []);
 
-  // if (sessionId) {
-  //   socket.emit("join_room", {
-  //     userId: user[0].userId,
-  //     username: user[0].username,
-  //     sessionId,
-  //   });
-  // }
-  const [votes, setvotes] = useState([
-    // {
-    //   id: uuidv4(),
-    //   user: "Max",
-    //   voteResult: 2,
-    // },
-    // {
-    //   id: uuidv4(),
-    //   user: "Tom",
-    //   voteResult: 3,
-    // },
-  ]);
+  const [sessionIdVar, setSessionIdVar] = useState("session123");
+  const [votes, setvotes] = useState([]);
   const [votesShow, setVotesShow] = useState(false);
 
   const displayVotes = votes.map((vote) => {
@@ -168,7 +145,8 @@ export function VotingRoom({ isDeveloper, user, setUser }) {
               ) : (
                 <AdminButtons
                   votesShow={votesShow}
-                  setVotesShow={setVotesShow}></AdminButtons>
+                  setVotesShow={setVotesShow}
+                  sessionIdVar={sessionIdVar}></AdminButtons>
               )}
             </Box>
           </Grid>

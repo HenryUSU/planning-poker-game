@@ -32,6 +32,7 @@ function App() {
                 <Login
                   isDeveloper={isDeveloper}
                   setDeveloper={setDeveloper}
+                  user={user}
                   setUser={setUser}></Login>
               }></Route>
             <Route
