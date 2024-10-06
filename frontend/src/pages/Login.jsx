@@ -56,21 +56,19 @@ export function Login({
     //form validation for developer
     if (form.radiogroup.value === "developer") {
       if (!form.username.value.trim()) {
-        console.log("Please fill out all required fields");
         toast.error(`Username is required!`);
         setInputErrorUsername(true);
         return;
       }
       if (!form.session.value.trim()) {
-        console.log("Please fill out all required fields");
         toast.error(`Session Id is required!`);
         setInputErrorSessionId(true);
         return;
       }
     }
 
-    console.log(`username: ${form.username.value}`);
-    console.log(`role: ${form.radiogroup.value}`);
+    // console.log(`username: ${form.username.value}`);
+    // console.log(`role: ${form.radiogroup.value}`);
 
     //generate userId, get username and role from Textinput
     setUser([

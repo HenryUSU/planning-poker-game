@@ -11,6 +11,7 @@ import { useEffect } from "react";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import IconButton from "@mui/material/IconButton";
 import { toast } from "react-toastify";
+import QRCode from "react-qr-code";
 
 export function VotingRoom({
   isDeveloper,
@@ -250,7 +251,31 @@ export function VotingRoom({
           </Grid>
           <Grid size={3}></Grid>
           {/* Footer */}
-          <Grid size={12}></Grid>
+          <Grid size={12}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                m: 1,
+              }}>
+              {" "}
+              Join Session via QR code:
+            </Box>
+            <Box
+              sx={{
+                height: "auto",
+                margin: "0 auto",
+                maxWidth: 64,
+                width: "100%",
+              }}>
+              <QRCode
+                size={256}
+                style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+                value={`http://localhost:5173/login/${sessionIdVar}`}
+                viewBox={`0 0 256 256`}
+              />
+            </Box>
+          </Grid>
         </Grid>
       </Box>
     </Box>
