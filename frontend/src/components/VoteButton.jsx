@@ -2,11 +2,15 @@ import Paper from "@mui/material/Paper";
 import { Box } from "@mui/material";
 import { socket } from "../components/socket";
 
-export const VoteButton = ({ value, imgSource }) => {
+export const VoteButton = ({ value, imgSource, sessionIdVar }) => {
   const handleClick = () => {
     console.log(`Vote: ${value}`);
     const localUserId = localStorage.getItem("userId");
-    socket.emit("updateVote", { userId: localUserId, voteResult: value });
+    socket.emit("updateVote", {
+      userId: localUserId,
+      voteResult: value,
+      sessionId: sessionIdVar,
+    });
   };
   return (
     <Box onClick={handleClick}>
