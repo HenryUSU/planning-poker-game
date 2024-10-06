@@ -1,6 +1,7 @@
 import Paper from "@mui/material/Paper";
 import { Box } from "@mui/material";
 import { socket } from "../components/socket";
+import { toast } from "react-toastify";
 
 export const VoteButton = ({ value, imgSource, sessionIdVar }) => {
   const handleClick = () => {
@@ -11,6 +12,7 @@ export const VoteButton = ({ value, imgSource, sessionIdVar }) => {
       voteResult: value,
       sessionId: sessionIdVar,
     });
+    toast.success(`Voted ${value} Story Points!`);
   };
   return (
     <Box onClick={handleClick}>

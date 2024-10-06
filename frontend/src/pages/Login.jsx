@@ -7,13 +7,28 @@ import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
+import { toast } from "react-toastify";
+import { useParams } from "react-router-dom";
 
-export function Login({ isDeveloper, setDeveloper, user, setUser }) {
+export function Login({
+  isDeveloper,
+  setDeveloper,
+  user,
+  setUser,
+  sessionIdVar,
+  setSessionIdVar,
+}) {
   const formRef = useRef();
   const navigator = useNavigate();
+  const [inputErrorUsername, setInputErrorUsername] = useState(false);
+  const [inputErrorSessionId, setInputErrorSessionId] = useState(false);
+
+  const { id } = useParams();
+
+  //console.log(`session id from URL: ${id} `);
 
   const handleDeveloperToggle = (e) => {
     e.preventDefault();
@@ -26,7 +41,34 @@ export function Login({ isDeveloper, setDeveloper, user, setUser }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
     const form = formRef.current;
+
+    //form validation for role productmanager
+    if (form.radiogroup.value === "productmanager") {
+      if (!form.username.value.trim()) {
+        //  console.log("Please fill the username");
+        toast.error(`Username is required!`);
+        setInputErrorUsername(true);
+        return;
+      }
+    }
+
+    if (form.radiogroup.value === "developer") {
+      if (!form.username.value.trim()) {
+        console.log("Please fill out all required fields");
+        toast.error(`Username is required!`);
+        setInputErrorUsername(true);
+        return;
+      }
+      if (!form.session.value.trim()) {
+        console.log("Please fill out all required fields");
+        toast.error(`Session Id is required!`);
+        setInputErrorSessionId(true);
+        return;
+      }
+    }
+
     console.log(`username: ${form.username.value}`);
     console.log(`role: ${form.radiogroup.value}`);
     setUser([
@@ -37,7 +79,17 @@ export function Login({ isDeveloper, setDeveloper, user, setUser }) {
       },
     ]);
 
+    if (formRef.current.radiogroup.value === "developer") {
+      setSessionIdVar(form.session.value.trim());
+    }
+
     navigator("/session");
+  };
+
+  const handleResetForm = (e) => {
+    e.preventDefault();
+    setInputErrorSessionId(false);
+    setInputErrorUsername(false);
   };
 
   return (
@@ -82,7 +134,8 @@ export function Login({ isDeveloper, setDeveloper, user, setUser }) {
                 placeholder="Enter username"
                 variant="outlined"
                 type="text"
-                required></TextField>
+                required
+                error={inputErrorUsername}></TextField>
               <FormControl>
                 <FormLabel id="demo-radio-buttons-group-label">
                   Set role
@@ -112,7 +165,9 @@ export function Login({ isDeveloper, setDeveloper, user, setUser }) {
                   placeholder="Enter Session ID"
                   variant="outlined"
                   type="text"
-                  required></TextField>
+                  required
+                  defaultValue={id}
+                  error={inputErrorSessionId}></TextField>
               ) : null}
 
               <Box
@@ -123,7 +178,10 @@ export function Login({ isDeveloper, setDeveloper, user, setUser }) {
                   justifyContent: "center",
                   alignItems: "center",
                 }}>
-                <Button variant="contained" type="reset">
+                <Button
+                  variant="contained"
+                  type="reset"
+                  onClick={handleResetForm}>
                   Reset
                 </Button>
                 {isDeveloper ? (
