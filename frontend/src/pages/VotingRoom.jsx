@@ -26,6 +26,7 @@ export function VotingRoom({
 
   const filteredVotes = votes.filter((vote) => vote.role === "developer");
 
+  //display username and vote. If vote is empty, display ?. If dev has voted, display checkmark. Admin show results via voteshow = true
   const displayVotes = filteredVotes.map((vote) => {
     if (!votesShow) {
       if (vote.hasVoted) {
@@ -45,19 +46,9 @@ export function VotingRoom({
           voteResult={vote.voteResult}></Votes>
       );
     }
-
-    // if (vote.role === "developer") {
-    //   return !votesShow ? (
-    //     <Votes key={vote.userId} user={vote.username} voteResult="?"></Votes>
-    //   ) : (
-    //     <Votes
-    //       key={vote.userId}
-    //       user={vote.username}
-    //       voteResult={vote.voteResult}></Votes>
-    //   );
-    // }
   });
 
+  //calculates the average of all votes from developers
   const calculateAverage = () => {
     let averageVote = 0;
     const filteredVotes = votes.filter((vote) => vote.role === "developer");
@@ -72,11 +63,13 @@ export function VotingRoom({
       return null;
     }
   };
-  //const sessionId = "session123";
+
+  //when there is no sessionID, send emit to backend to create one
   if (!sessionIdVar) {
     socket.emit("createSessionId", {});
   }
 
+  //new users join a room and emit data to backend
   socket.emit("join-room", {
     sessionId: sessionIdVar,
     userId: user[0].userId,
@@ -85,12 +78,14 @@ export function VotingRoom({
     voteResult: 0,
   });
 
+  //if organizer is not set in frontend, try to get it from backend
   if (!organizer) {
     socket.emit("getOrganizer", {
       sessionId: sessionIdVar,
     });
   }
 
+  //copy session id incl url to clipbboard
   const handleCopyToClipboard = () => {
     navigator.clipboard.writeText(
       `http://localhost:5173/login/${sessionIdVar}`
@@ -101,35 +96,40 @@ export function VotingRoom({
   useEffect(() => {
     socket.connect();
 
-    console.log(`User from frontend: ${user[0].username}`);
+    //console.log(`User from frontend: ${user[0].username}`);
+
+    //save userId in localstorage
     localStorage.setItem("userId", `${user[0].userId}`);
 
+    //receive generate session id from backend
     socket.on("sessionIdGenerated", ({ sessionId }) => {
-      console.log(`generated sessionId from backend: ${sessionId}`);
+      // console.log(`generated sessionId from backend: ${sessionId}`);
       setSessionIdVar(sessionId);
     });
 
+    //receive updated data from backend to update frontend for all users
     socket.on("updateData", ({ users }) => {
-      console.log(`Users from backend: ${JSON.stringify(users)}`);
+      // console.log(`Users from backend: ${JSON.stringify(users)}`);
       setvotes(users);
     });
 
-    socket.on("hasVoted", () => {
-      //  setHasVoted(true);
-    });
+    //show votes for all users
     socket.on("votesShown", () => {
       setVotesShow(true);
     });
+
+    //reset votes for all users
     socket.on("votesResetted", () => {
       setVotesShow(false);
-      // setHasVoted(false);
     });
 
+    // receive organizer from backend and update frontend for all users
     socket.on("setOrganizer", ({ username }) => {
-      console.log(`organizer from backend: ${JSON.stringify(username)}`);
+      //console.log(`organizer from backend: ${JSON.stringify(username)}`);
       setOrganizer(username);
     });
 
+    //remove event listener for socketrs
     return () => {
       socket.off("sessionIdGenerated");
       socket.off("updateData");
@@ -204,6 +204,7 @@ export function VotingRoom({
                 flexWrap: "wrap",
               }}>
               {" "}
+              {/* Show vote buttons if role is developer or show admin buttons if role is productmanager  */}
               {isDeveloper ? (
                 <Fragment>
                   <VoteButton

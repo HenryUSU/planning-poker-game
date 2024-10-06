@@ -26,10 +26,10 @@ export function Login({
   const [inputErrorUsername, setInputErrorUsername] = useState(false);
   const [inputErrorSessionId, setInputErrorSessionId] = useState(false);
 
+  //get session id from URL param
   const { id } = useParams();
 
-  //console.log(`session id from URL: ${id} `);
-
+  //Depending on selected radiogroup, show different controls in form
   const handleDeveloperToggle = (e) => {
     e.preventDefault();
     if (formRef.current.radiogroup.value === "developer") {
@@ -47,13 +47,13 @@ export function Login({
     //form validation for role productmanager
     if (form.radiogroup.value === "productmanager") {
       if (!form.username.value.trim()) {
-        //  console.log("Please fill the username");
         toast.error(`Username is required!`);
         setInputErrorUsername(true);
         return;
       }
     }
 
+    //form validation for developer
     if (form.radiogroup.value === "developer") {
       if (!form.username.value.trim()) {
         console.log("Please fill out all required fields");
@@ -71,6 +71,8 @@ export function Login({
 
     console.log(`username: ${form.username.value}`);
     console.log(`role: ${form.radiogroup.value}`);
+
+    //generate userId, get username and role from Textinput
     setUser([
       {
         userId: uuidv4(),
@@ -79,6 +81,7 @@ export function Login({
       },
     ]);
 
+    // set session Id from input field
     if (formRef.current.radiogroup.value === "developer") {
       setSessionIdVar(form.session.value.trim());
     }
@@ -86,6 +89,7 @@ export function Login({
     navigator("/session");
   };
 
+  //reset error state from form validation
   const handleResetForm = (e) => {
     e.preventDefault();
     setInputErrorSessionId(false);
@@ -157,6 +161,9 @@ export function Login({
                   />
                 </RadioGroup>
               </FormControl>
+
+              {/* Depending in isDeveloper state, show different form input fields */}
+
               {isDeveloper ? (
                 <TextField
                   id="session"

@@ -4,6 +4,7 @@ import { socket } from "../components/socket";
 import { toast } from "react-toastify";
 
 export const VoteButton = ({ value, imgSource, sessionIdVar }) => {
+  //emits the value of the voting card to the backend for the current user
   const handleClick = () => {
     console.log(`Vote: ${value}`);
     const localUserId = localStorage.getItem("userId");

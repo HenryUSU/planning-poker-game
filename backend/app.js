@@ -28,6 +28,7 @@ const io = new Server(httpServer, {
 
 mongoose.connect(process.env.MONGO_DB_CLIENT);
 
+//schema for database
 const userSchema = new mongoose.Schema(
   {
     sessionId: String,
@@ -49,6 +50,7 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+//in case deletion goes wrong, delete all data after 30 minutes
 userSchema.path("createdAt").index({ expireAfterSeconds: 1800 });
 const UserSessionEntry = mongoose.model("Poker-Session", userSchema);
 
@@ -63,12 +65,15 @@ httpServer.listen(port, () => {
 io.on("connection", (socket) => {
   console.log("a user connected with ID" + socket.id);
 
+  //list to emit from frontend to create a new session id
   socket.on("createSessionId", () => {
     const sessionId = uuidv4();
     console.log(`sessionId generated with Id: ${sessionId}`);
     socket.emit("sessionIdGenerated", { sessionId: sessionId });
   });
 
+  //listens to emits from frontend if user joins a room, then create a new entry in database with all user data
+  //then load updated data from database end emit it to frontend as "updateData"
   socket.on("join-room", async (msg) => {
     socket.join(msg.sessionId);
     console.log(
@@ -103,6 +108,8 @@ io.on("connection", (socket) => {
     }
   });
 
+  //listens to socket from frontend to get an organizer. Look in database for current session id and role = productmanager
+  //emit the organizer name to frontend
   socket.on("getOrganizer", async (msg) => {
     console.log(`session id from frontend to get organizer: ${msg.sessionId}`);
     try {
@@ -119,6 +126,8 @@ io.on("connection", (socket) => {
     }
   });
 
+  //listen to socket with votes from frontend. Update database for current user with vote result and set hasVoted status to true
+  //then load updated data from database end emit it to frontend as "updateData"
   socket.on("updateVote", async (msg) => {
     try {
       const sessionData = await UserSessionEntry.findOneAndUpdate(
@@ -135,12 +144,14 @@ io.on("connection", (socket) => {
       io.to(msg.sessionId).emit("updateData", {
         users: newSessionData,
       });
-      io.to(msg.sessionId).emit("hasVoted", {});
     } catch (error) {
       console.log(`error receving data: ${error}`);
     }
   });
 
+  //listen to sockets for reseted votes. Then reset all votes for current session id in database and set vote status false
+  //listen to socket with votes from frontend. Update database for current user with vote result and set hasVoted status to true
+  //then load updated data from database end emit it to frontend as "updateData"
   socket.on("resetVote", async (msg) => {
     try {
       const sessionData = await UserSessionEntry.updateMany(
@@ -164,10 +175,12 @@ io.on("connection", (socket) => {
     }
   });
 
+  //listen to sockets to show votes and emit socket to frontend
   socket.on("showVotes", (msg) => {
     io.to(msg.sessionId).emit("votesShown", {});
   });
 
+  //try to remove users who have left the session from database
   socket.on("disconnect", async () => {
     try {
       const currentSessionId = await UserSessionEntry.findOne({
