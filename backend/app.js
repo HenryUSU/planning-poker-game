@@ -3,6 +3,7 @@ const { createServer } = require("http");
 const { Server } = require("socket.io");
 const { default: mongoose } = require("mongoose");
 const cors = require("cors");
+const { type } = require("os");
 const app = express();
 const httpServer = createServer(app);
 require("dotenv").config();
@@ -16,6 +17,12 @@ const io = new Server(httpServer, {
     origin: "http://localhost:5173",
     methods: ["GET", "POST"],
   },
+  // connectionStateRecovery: {
+  //   // the backup duration of the sessions and the packets
+  //   maxDisconnectionDuration: 2 * 60 * 1000,
+  //   // whether to skip middlewares upon successful recovery
+  //   skipMiddlewares: true,
+  // },
 });
 
 mongoose.connect(process.env.MONGO_DB_CLIENT);
@@ -24,9 +31,14 @@ const userSchema = new mongoose.Schema(
   {
     sessionId: String,
     userId: String,
+    socketId: String,
     username: String,
     role: String,
     voteResult: Number,
+    hasVoted: {
+      type: Boolean,
+      default: false,
+    },
     createdAt: {
       type: Date,
       default: Date.now,
@@ -62,6 +74,7 @@ io.on("connection", (socket) => {
         const newEntry = new UserSessionEntry({
           sessionId: msg.sessionId,
           userId: msg.userId,
+          socketId: socket.id,
           username: msg.username,
           role: msg.role,
           voteResult: msg.voteResult,
@@ -74,7 +87,7 @@ io.on("connection", (socket) => {
           sessionId: msg.sessionId,
         });
         console.log(`Session Data from DB of current session: ${sessionData}`);
-        io.to(msg.sessionId).emit("room-joined", {
+        io.to(msg.sessionId).emit("updateData", {
           users: sessionData,
         });
       }
@@ -89,16 +102,17 @@ io.on("connection", (socket) => {
         {
           userId: msg.userId,
         },
-        { voteResult: msg.voteResult }
+        { voteResult: msg.voteResult, hasVoted: true }
       );
 
       const newSessionData = await UserSessionEntry.find({
         sessionId: msg.sessionId,
       });
       console.log(`Session Data from DB of current session: ${sessionData}`);
-      io.to(msg.sessionId).emit("room-joined", {
+      io.to(msg.sessionId).emit("updateData", {
         users: newSessionData,
       });
+      io.to(msg.sessionId).emit("hasVoted", {});
     } catch (error) {
       console.log(`error receving data: ${error}`);
     }
@@ -110,6 +124,7 @@ io.on("connection", (socket) => {
         { sessionId: msg.sessionId },
         {
           voteResult: 0,
+          hasVoted: false,
         }
       );
 
@@ -117,7 +132,7 @@ io.on("connection", (socket) => {
         sessionId: msg.sessionId,
       });
       console.log(`Session Data from DB of current session: ${sessionData}`);
-      io.to(msg.sessionId).emit("room-joined", {
+      io.to(msg.sessionId).emit("updateData", {
         users: newSessionData,
       });
       io.to(msg.sessionId).emit("votesResetted", {});
@@ -130,7 +145,23 @@ io.on("connection", (socket) => {
     io.to(msg.sessionId).emit("votesShown", {});
   });
 
-  socket.on("disconnect", () => {
-    console.log("Client disconnected");
+  socket.on("disconnect", async () => {
+    try {
+      const currentSessionId = await UserSessionEntry.findOne({
+        socketId: socket.id,
+      });
+      const newSessionData = await UserSessionEntry.find({
+        sessionId: currentSessionId.sessionId,
+      });
+
+      io.to(currentSessionId.sessionId).emit("updateData", {
+        users: newSessionData,
+      });
+    } catch (error) {
+      console.log(`error: ${error}`);
+    }
+
+    await UserSessionEntry.deleteOne({ socketId: socket.id });
+    console.log(`Client disconnected, deleting id ${socket.id}from DB`);
   });
 });
