@@ -5,12 +5,14 @@ import { socket } from "../components/socket";
 import { toast } from "react-toastify";
 
 export function AdminButtons({ votesShow, setVotesShow, sessionIdVar }) {
+  //emits message to backend with session id to show votes for all users
   const handleShowVotes = () => {
     socket.emit("showVotes", { sessionId: sessionIdVar });
     toast.success(`Votes shown!`);
     // setVotesShow(true);
   };
 
+  //emits message with session id to backend to reset all vote results
   const handleResetVotes = () => {
     socket.emit("resetVote", { sessionId: sessionIdVar });
     toast.success(`Votes resetted!`);

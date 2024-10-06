@@ -84,8 +84,6 @@ function App() {
               }></Route>
           </Routes>
         </BrowserRouter>
-        {/* <Login></Login> */}
-        {/* <VotingRoom></VotingRoom> */}
       </CssBaseline>
     </Fragment>
   );
