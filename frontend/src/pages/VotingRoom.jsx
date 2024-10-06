@@ -8,12 +8,21 @@ import { VoteButton } from "../components/VoteButton";
 import { AdminButtons } from "../components/AdminButtons";
 import { socket } from "../components/socket";
 import { useEffect } from "react";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import IconButton from "@mui/material/IconButton";
+import { toast } from "react-toastify";
 
-export function VotingRoom({ isDeveloper, user, setUser }) {
-  const [sessionIdVar, setSessionIdVar] = useState("session123");
+export function VotingRoom({
+  isDeveloper,
+  user,
+  setUser,
+  sessionIdVar,
+  setSessionIdVar,
+}) {
   const [votes, setvotes] = useState([]);
   // const [hasVoted, setHasVoted] = useState([false]);
   const [votesShow, setVotesShow] = useState(false);
+  const [organizer, setOrganizer] = useState("");
 
   const filteredVotes = votes.filter((vote) => vote.role === "developer");
 
@@ -63,20 +72,42 @@ export function VotingRoom({ isDeveloper, user, setUser }) {
       return null;
     }
   };
-  const sessionId = "session123";
+  //const sessionId = "session123";
+  if (!sessionIdVar) {
+    socket.emit("createSessionId", {});
+  }
+
   socket.emit("join-room", {
-    sessionId: sessionId,
+    sessionId: sessionIdVar,
     userId: user[0].userId,
     username: user[0].username,
     role: user[0].role,
     voteResult: 0,
   });
 
+  if (!organizer) {
+    socket.emit("getOrganizer", {
+      sessionId: sessionIdVar,
+    });
+  }
+
+  const handleCopyToClipboard = () => {
+    navigator.clipboard.writeText(
+      `http://localhost:5173/login/${sessionIdVar}`
+    );
+    toast.success(`Session Id copied successfully!`);
+  };
+
   useEffect(() => {
     socket.connect();
 
     console.log(`User from frontend: ${user[0].username}`);
     localStorage.setItem("userId", `${user[0].userId}`);
+
+    socket.on("sessionIdGenerated", ({ sessionId }) => {
+      console.log(`generated sessionId from backend: ${sessionId}`);
+      setSessionIdVar(sessionId);
+    });
 
     socket.on("updateData", ({ users }) => {
       console.log(`Users from backend: ${JSON.stringify(users)}`);
@@ -94,11 +125,18 @@ export function VotingRoom({ isDeveloper, user, setUser }) {
       // setHasVoted(false);
     });
 
+    socket.on("setOrganizer", ({ username }) => {
+      console.log(`organizer from backend: ${JSON.stringify(username)}`);
+      setOrganizer(username);
+    });
+
     return () => {
+      socket.off("sessionIdGenerated");
       socket.off("updateData");
       socket.off("hasVoted");
       socket.off("votesResetted");
       socket.off("votesShown");
+      socket.off("setOrganizer");
     };
   }, []);
 
@@ -125,8 +163,17 @@ export function VotingRoom({ isDeveloper, user, setUser }) {
                 alignItems: "center",
                 gap: 2,
               }}>
-              <Box>Organizer: {!isDeveloper && ` ${user[0].username}`}</Box>
+              <Box>Organizer: {organizer}</Box>
               <Box>Current User: {user[0].username}</Box>
+              <Box>
+                Room Id: {sessionIdVar}{" "}
+                <IconButton
+                  color="primary"
+                  aria-label="copy sessionId"
+                  onClick={handleCopyToClipboard}>
+                  <ContentCopyIcon />
+                </IconButton>
+              </Box>
             </Box>
           </Grid>
 

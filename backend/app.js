@@ -6,6 +6,7 @@ const cors = require("cors");
 const { type } = require("os");
 const app = express();
 const httpServer = createServer(app);
+const { v4: uuidv4 } = require("uuid");
 require("dotenv").config();
 const port = 3000;
 
@@ -62,6 +63,12 @@ httpServer.listen(port, () => {
 io.on("connection", (socket) => {
   console.log("a user connected with ID" + socket.id);
 
+  socket.on("createSessionId", () => {
+    const sessionId = uuidv4();
+    console.log(`sessionId generated with Id: ${sessionId}`);
+    socket.emit("sessionIdGenerated", { sessionId: sessionId });
+  });
+
   socket.on("join-room", async (msg) => {
     socket.join(msg.sessionId);
     console.log(
@@ -93,6 +100,22 @@ io.on("connection", (socket) => {
       }
     } catch (error) {
       console.log(`error saving message: ${error}`);
+    }
+  });
+
+  socket.on("getOrganizer", async (msg) => {
+    console.log(`session id from frontend to get organizer: ${msg.sessionId}`);
+    try {
+      const organizer = await UserSessionEntry.findOne({
+        sessionId: msg.sessionId,
+        role: "productmanager",
+      });
+      console.log(`Organizer from database: ${organizer.username}`);
+      io.to(msg.sessionId).emit("setOrganizer", {
+        username: organizer.username,
+      });
+    } catch (error) {
+      console.log(`error receiving Organizer: ${error}`);
     }
   });
 
