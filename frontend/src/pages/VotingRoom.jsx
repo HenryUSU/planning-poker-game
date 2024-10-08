@@ -89,7 +89,7 @@ export function VotingRoom({
   //copy session id incl url to clipbboard
   const handleCopyToClipboard = () => {
     navigator.clipboard.writeText(
-      `http://localhost:5173/login/${sessionIdVar}`
+      `${import.meta.env.VITE_FRONTEND_URL}/login/${sessionIdVar}`
     );
     toast.success(`Session Id copied successfully!`);
   };
