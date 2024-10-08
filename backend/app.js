@@ -8,14 +8,14 @@ const app = express();
 const httpServer = createServer(app);
 const { v4: uuidv4 } = require("uuid");
 require("dotenv").config();
-const port = 3000;
+const port = process.env.PORT;
 
 app.use(cors());
 const io = new Server(httpServer, {
   /* options */
   path: "/session/",
   cors: {
-    origin: "http://localhost:5173",
+    origin: `${process.env.FRONTEND_URL}`,
     methods: ["GET", "POST"],
   },
   // connectionStateRecovery: {
@@ -79,7 +79,18 @@ io.on("connection", (socket) => {
     console.log(
       `Message received: ${msg.userId}, ${msg.username}, ${msg.sessionId}, ${msg.role}, ${msg.voteResult}`
     );
+
     const userExist = await UserSessionEntry.findOne({ userId: msg.userId });
+
+    //delete all data
+    // const result = await UserSessionEntry.deleteMany({});
+    // console.log(`Deleted ${result.deletedCount} documents`);
+
+    // const emptySession = await UserSessionEntry.findOne({
+    //   sessionId: "",
+    //   role: "productmanager",
+    // });
+    // console.log(`empty session: ${emptySession}`);
 
     try {
       if (!userExist) {
@@ -103,6 +114,30 @@ io.on("connection", (socket) => {
           users: sessionData,
         });
       }
+      // else {
+      //   const updatedUser = await UserSessionEntry.findOneAndUpdate(
+      //     { sessionId: "", role: "productmanager" },
+      //     {
+      //       $set: {
+      //         sessionId: msg.sessionId,
+      //       },
+      //     },
+      //     { new: true, upsert: true }
+      //   );
+
+      //   if (!updatedUser) {
+      //     throw new Error("Failed to update or insert user");
+      //   }
+
+      //   console.log("User data updated or inserted successfully");
+
+      //   const sessionData = await UserSessionEntry.find({
+      //     sessionId: msg.sessionId,
+      //   });
+      //   console.log(`Session Data from DB of current session: ${sessionData}`);
+
+      //   io.to(msg.sessionId).emit("updateData", { users: sessionData });
+      // }
     } catch (error) {
       console.log(`error saving message: ${error}`);
     }
