@@ -281,7 +281,7 @@ export function VotingRoom({
               sx={{
                 height: "auto",
                 margin: "0 auto",
-                maxWidth: 64,
+                maxWidth: 128,
                 width: "100%",
               }}
             >
