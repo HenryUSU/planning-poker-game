@@ -8,15 +8,25 @@ const app = express();
 const httpServer = createServer(app);
 const { v4: uuidv4 } = require("uuid");
 require("dotenv").config();
-const port = process.env.PORT;
+const PORT = process.env.PORT || 3000;
 
-app.use(cors());
+// CORS configuration for Express
+const corsOptions = {
+  origin: process.env.FRONTEND_URL,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
+  optionsSuccessStatus: 200,
+};
+app.use(cors(corsOptions));
+
 const io = new Server(httpServer, {
   /* options */
   path: "/session/",
   cors: {
-    origin: `${process.env.FRONTEND_URL}`,
+    origin: `process.env.FRONTEND_URL`,
     methods: ["GET", "POST"],
+    credentials: true,
   },
   // connectionStateRecovery: {
   //   // the backup duration of the sessions and the packets
@@ -58,8 +68,8 @@ app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
-httpServer.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
+httpServer.listen(PORT, () => {
+  console.log(`Example app listening on PORT ${PORT}`);
 });
 
 io.on("connection", (socket) => {
