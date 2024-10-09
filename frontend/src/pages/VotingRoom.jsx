@@ -44,7 +44,8 @@ export function VotingRoom({
         <Votes
           key={vote.userId}
           user={vote.username}
-          voteResult={vote.voteResult}></Votes>
+          voteResult={vote.voteResult}
+        ></Votes>
       );
     }
   });
@@ -152,7 +153,8 @@ export function VotingRoom({
                 textAlign: "center",
               }}
               variant="h2"
-              gutterBottom>
+              gutterBottom
+            >
               Planning Poker Game
             </Typography>
           </Grid>
@@ -163,7 +165,8 @@ export function VotingRoom({
                 justifyContent: "center",
                 alignItems: "center",
                 gap: 2,
-              }}>
+              }}
+            >
               <Box>Organizer: {organizer}</Box>
               <Box>Current User: {user[0].username}</Box>
               <Box>
@@ -171,7 +174,8 @@ export function VotingRoom({
                 <IconButton
                   color="primary"
                   aria-label="copy sessionId"
-                  onClick={handleCopyToClipboard}>
+                  onClick={handleCopyToClipboard}
+                >
                   <ContentCopyIcon />
                 </IconButton>
               </Box>
@@ -190,7 +194,8 @@ export function VotingRoom({
                 gap: "10px",
                 border: "1px solid black",
                 padding: "15px",
-              }}>
+              }}
+            >
               <Typography variant="h4">Votes</Typography>
               <Box>
                 {/* <Votes user={"Max"} voteResult={"5"}></Votes> */}
@@ -203,7 +208,8 @@ export function VotingRoom({
                 display: "flex",
                 flexDirection: "row",
                 flexWrap: "wrap",
-              }}>
+              }}
+            >
               {" "}
               {/* Show vote buttons if role is developer or show admin buttons if role is productmanager  */}
               {isDeveloper ? (
@@ -211,41 +217,50 @@ export function VotingRoom({
                   <VoteButton
                     value={1}
                     imgSource={"./svg/1_card.svg"}
-                    sessionIdVar={sessionIdVar}></VoteButton>
+                    sessionIdVar={sessionIdVar}
+                  ></VoteButton>
                   <VoteButton
                     value={2}
                     imgSource={"./svg/2_card.svg"}
-                    sessionIdVar={sessionIdVar}></VoteButton>
+                    sessionIdVar={sessionIdVar}
+                  ></VoteButton>
                   <VoteButton
                     value={3}
                     imgSource={"./svg/3_card.svg"}
-                    sessionIdVar={sessionIdVar}></VoteButton>
+                    sessionIdVar={sessionIdVar}
+                  ></VoteButton>
                   <VoteButton
                     value={5}
                     imgSource={"./svg/5_card.svg"}
-                    sessionIdVar={sessionIdVar}></VoteButton>
+                    sessionIdVar={sessionIdVar}
+                  ></VoteButton>
                   <VoteButton
                     value={8}
                     imgSource={"./svg/8_card.svg"}
-                    sessionIdVar={sessionIdVar}></VoteButton>
+                    sessionIdVar={sessionIdVar}
+                  ></VoteButton>
                   <VoteButton
                     value={13}
                     imgSource={"./svg/13_card.svg"}
-                    sessionIdVar={sessionIdVar}></VoteButton>
+                    sessionIdVar={sessionIdVar}
+                  ></VoteButton>
                   <VoteButton
                     value={"?"}
                     imgSource={"./svg/question_card.svg"}
-                    sessionIdVar={sessionIdVar}></VoteButton>
+                    sessionIdVar={sessionIdVar}
+                  ></VoteButton>
                   <VoteButton
                     value={"Coffee break"}
                     imgSource={"./svg/coffee_card.svg"}
-                    sessionIdVar={sessionIdVar}></VoteButton>
+                    sessionIdVar={sessionIdVar}
+                  ></VoteButton>
                 </Fragment>
               ) : (
                 <AdminButtons
                   votesShow={votesShow}
                   setVotesShow={setVotesShow}
-                  sessionIdVar={sessionIdVar}></AdminButtons>
+                  sessionIdVar={sessionIdVar}
+                ></AdminButtons>
               )}
             </Box>
           </Grid>
@@ -257,7 +272,8 @@ export function VotingRoom({
                 display: "flex",
                 justifyContent: "center",
                 m: 1,
-              }}>
+              }}
+            >
               {" "}
               Join Session via QR code:
             </Box>
@@ -267,11 +283,14 @@ export function VotingRoom({
                 margin: "0 auto",
                 maxWidth: 64,
                 width: "100%",
-              }}>
+              }}
+            >
               <QRCode
                 size={256}
                 style={{ height: "auto", maxWidth: "100%", width: "100%" }}
-                value={`http://localhost:5173/login/${sessionIdVar}`}
+                value={`${
+                  import.meta.env.VITE_FRONTEND_URL
+                }/login/${sessionIdVar}`}
                 viewBox={`0 0 256 256`}
               />
             </Box>
