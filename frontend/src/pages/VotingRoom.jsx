@@ -221,6 +221,8 @@ export function VotingRoom({
                 display: "flex",
                 flexDirection: "row",
                 flexWrap: "wrap",
+                justifyContent: "center",
+                alignItems: "center",
               }}>
               {" "}
               {/* Show vote buttons if role is developer or show admin buttons if role is productmanager  */}
