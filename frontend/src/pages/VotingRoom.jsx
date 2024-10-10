@@ -12,6 +12,7 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import IconButton from "@mui/material/IconButton";
 import { toast } from "react-toastify";
 import QRCode from "react-qr-code";
+import useExitPrompt from "../components/useExitPrompt";
 
 export function VotingRoom({
   isDeveloper,
@@ -24,6 +25,7 @@ export function VotingRoom({
   // const [hasVoted, setHasVoted] = useState([false]);
   const [votesShow, setVotesShow] = useState(false);
   const [organizer, setOrganizer] = useState("");
+  const [showExitPrompt, setShowExitPrompt] = useExitPrompt(true);
 
   const filteredVotes = votes.filter((vote) => vote.role === "developer");
 
@@ -104,8 +106,12 @@ export function VotingRoom({
 
     //console.log(`User from frontend: ${user[0].username}`);
 
-    //save userId in localstorage
-    localStorage.setItem("userId", `${user[0].userId}`);
+    // Check if user array has items before accessing user[0]
+    if (Array.isArray(user) && user.length > 0) {
+      localStorage.setItem("userId", `${user[0].userId}`);
+    } else {
+      console.warn("User array is empty or not an array");
+    }
 
     //receive generate session id from backend
     socket.on("sessionIdGenerated", ({ sessionId }) => {
