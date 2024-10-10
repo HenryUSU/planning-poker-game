@@ -216,35 +216,48 @@ export function VotingRoom({
                   <VoteButton
                     value={1}
                     imgSource={"./svg/1_card.svg"}
-                    sessionIdVar={sessionIdVar}></VoteButton>
+                    sessionIdVar={sessionIdVar}
+                    tooltipText="1 - Low hanging fruit"></VoteButton>
                   <VoteButton
                     value={2}
                     imgSource={"./svg/2_card.svg"}
-                    sessionIdVar={sessionIdVar}></VoteButton>
+                    sessionIdVar={sessionIdVar}
+                    tooltipText="2 - Piece of cake"></VoteButton>
                   <VoteButton
                     value={3}
                     imgSource={"./svg/3_card.svg"}
-                    sessionIdVar={sessionIdVar}></VoteButton>
+                    sessionIdVar={sessionIdVar}
+                    tooltipText="3 - It Ain’t Rocket Science"></VoteButton>
                   <VoteButton
                     value={5}
                     imgSource={"./svg/5_card.svg"}
-                    sessionIdVar={sessionIdVar}></VoteButton>
+                    sessionIdVar={sessionIdVar}
+                    tooltipText="5 - Ornitorinco"></VoteButton>
                   <VoteButton
                     value={8}
                     imgSource={"./svg/8_card.svg"}
-                    sessionIdVar={sessionIdVar}></VoteButton>
+                    sessionIdVar={sessionIdVar}
+                    tooltipText="8 - An arm and a leg"></VoteButton>
                   <VoteButton
                     value={13}
                     imgSource={"./svg/13_card.svg"}
-                    sessionIdVar={sessionIdVar}></VoteButton>
+                    sessionIdVar={sessionIdVar}
+                    tooltipText="13 - Just squeaking by"></VoteButton>
+                  <VoteButton
+                    value={"∞"}
+                    imgSource={"./svg/infinite_card.svg"}
+                    sessionIdVar={sessionIdVar}
+                    tooltipText="Infinite - When pigs fly"></VoteButton>
                   <VoteButton
                     value={"? ? ?"}
                     imgSource={"./svg/question_card.svg"}
-                    sessionIdVar={sessionIdVar}></VoteButton>
+                    sessionIdVar={sessionIdVar}
+                    tooltipText="? - Here be dragons!"></VoteButton>
                   <VoteButton
                     value={"I need a break!"}
                     imgSource={"./svg/coffee_card.svg"}
-                    sessionIdVar={sessionIdVar}></VoteButton>
+                    sessionIdVar={sessionIdVar}
+                    tooltipText="Ping Pong - Coffee break card"></VoteButton>
                 </Fragment>
               ) : (
                 <AdminButtons
