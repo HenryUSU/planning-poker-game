@@ -27,7 +27,7 @@ function App() {
       <CssBaseline>
         <BrowserRouter>
           <ToastContainer
-            position="top-center"
+            position="top-left"
             autoClose={4000}
             hideProgressBar={false}
             newestOnTop={false}

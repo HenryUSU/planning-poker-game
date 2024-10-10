@@ -46,7 +46,7 @@ const userSchema = new mongoose.Schema(
     socketId: String,
     username: String,
     role: String,
-    voteResult: Number,
+    voteResult: String,
     hasVoted: {
       type: Boolean,
       default: false,

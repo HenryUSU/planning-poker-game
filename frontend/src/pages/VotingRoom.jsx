@@ -44,23 +44,27 @@ export function VotingRoom({
         <Votes
           key={vote.userId}
           user={vote.username}
-          voteResult={vote.voteResult}
-        ></Votes>
+          voteResult={vote.voteResult}></Votes>
       );
     }
   });
 
   //calculates the average of all votes from developers
   const calculateAverage = () => {
-    let averageVote = 0;
+    let sum = 0;
+    let validVoteCount = 0;
     const filteredVotes = votes.filter((vote) => vote.role === "developer");
+
     filteredVotes.forEach((vote) => {
-      if (vote.voteResult >= 0 && vote.voteResult <= 13) {
-        averageVote += vote.voteResult;
+      const voteValue = Number(vote.voteResult);
+      if (!isNaN(voteValue) && voteValue >= 0 && voteValue <= 13) {
+        sum += voteValue;
+        validVoteCount++;
       }
     });
-    if (votesShow) {
-      return averageVote / filteredVotes.length;
+
+    if (votesShow && validVoteCount > 0) {
+      return sum / validVoteCount;
     } else {
       return null;
     }
@@ -153,8 +157,7 @@ export function VotingRoom({
                 textAlign: "center",
               }}
               variant="h2"
-              gutterBottom
-            >
+              gutterBottom>
               Planning Poker Game
             </Typography>
           </Grid>
@@ -165,8 +168,7 @@ export function VotingRoom({
                 justifyContent: "center",
                 alignItems: "center",
                 gap: 2,
-              }}
-            >
+              }}>
               <Box>Organizer: {organizer}</Box>
               <Box>Current User: {user[0].username}</Box>
               <Box>
@@ -174,8 +176,7 @@ export function VotingRoom({
                 <IconButton
                   color="primary"
                   aria-label="copy sessionId"
-                  onClick={handleCopyToClipboard}
-                >
+                  onClick={handleCopyToClipboard}>
                   <ContentCopyIcon />
                 </IconButton>
               </Box>
@@ -194,8 +195,7 @@ export function VotingRoom({
                 gap: "10px",
                 border: "1px solid black",
                 padding: "15px",
-              }}
-            >
+              }}>
               <Typography variant="h4">Votes</Typography>
               <Box>
                 {/* <Votes user={"Max"} voteResult={"5"}></Votes> */}
@@ -208,8 +208,7 @@ export function VotingRoom({
                 display: "flex",
                 flexDirection: "row",
                 flexWrap: "wrap",
-              }}
-            >
+              }}>
               {" "}
               {/* Show vote buttons if role is developer or show admin buttons if role is productmanager  */}
               {isDeveloper ? (
@@ -217,50 +216,41 @@ export function VotingRoom({
                   <VoteButton
                     value={1}
                     imgSource={"./svg/1_card.svg"}
-                    sessionIdVar={sessionIdVar}
-                  ></VoteButton>
+                    sessionIdVar={sessionIdVar}></VoteButton>
                   <VoteButton
                     value={2}
                     imgSource={"./svg/2_card.svg"}
-                    sessionIdVar={sessionIdVar}
-                  ></VoteButton>
+                    sessionIdVar={sessionIdVar}></VoteButton>
                   <VoteButton
                     value={3}
                     imgSource={"./svg/3_card.svg"}
-                    sessionIdVar={sessionIdVar}
-                  ></VoteButton>
+                    sessionIdVar={sessionIdVar}></VoteButton>
                   <VoteButton
                     value={5}
                     imgSource={"./svg/5_card.svg"}
-                    sessionIdVar={sessionIdVar}
-                  ></VoteButton>
+                    sessionIdVar={sessionIdVar}></VoteButton>
                   <VoteButton
                     value={8}
                     imgSource={"./svg/8_card.svg"}
-                    sessionIdVar={sessionIdVar}
-                  ></VoteButton>
+                    sessionIdVar={sessionIdVar}></VoteButton>
                   <VoteButton
                     value={13}
                     imgSource={"./svg/13_card.svg"}
-                    sessionIdVar={sessionIdVar}
-                  ></VoteButton>
+                    sessionIdVar={sessionIdVar}></VoteButton>
                   <VoteButton
-                    value={"?"}
+                    value={"? ? ?"}
                     imgSource={"./svg/question_card.svg"}
-                    sessionIdVar={sessionIdVar}
-                  ></VoteButton>
+                    sessionIdVar={sessionIdVar}></VoteButton>
                   <VoteButton
-                    value={"Coffee break"}
+                    value={"I need a break!"}
                     imgSource={"./svg/coffee_card.svg"}
-                    sessionIdVar={sessionIdVar}
-                  ></VoteButton>
+                    sessionIdVar={sessionIdVar}></VoteButton>
                 </Fragment>
               ) : (
                 <AdminButtons
                   votesShow={votesShow}
                   setVotesShow={setVotesShow}
-                  sessionIdVar={sessionIdVar}
-                ></AdminButtons>
+                  sessionIdVar={sessionIdVar}></AdminButtons>
               )}
             </Box>
           </Grid>
@@ -272,8 +262,7 @@ export function VotingRoom({
                 display: "flex",
                 justifyContent: "center",
                 m: 1,
-              }}
-            >
+              }}>
               {" "}
               Join Session via QR code:
             </Box>
@@ -283,8 +272,7 @@ export function VotingRoom({
                 margin: "0 auto",
                 maxWidth: 128,
                 width: "100%",
-              }}
-            >
+              }}>
               <QRCode
                 size={256}
                 style={{ height: "auto", maxWidth: "100%", width: "100%" }}
