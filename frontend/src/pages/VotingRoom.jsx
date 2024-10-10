@@ -167,7 +167,9 @@ export function VotingRoom({
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
+                flexWrap: "wrap",
                 gap: 2,
+                m: 1,
               }}>
               <Box>Organizer: {organizer}</Box>
               <Box>Current User: {user[0].username}</Box>
@@ -183,8 +185,8 @@ export function VotingRoom({
             </Box>
           </Grid>
 
-          <Grid size={4}></Grid>
-          <Grid size={5}>
+          <Grid size={{ xs: 0, md: 4 }}></Grid>
+          <Grid size={{ xs: 12, md: 4 }}>
             <Box
               sx={{
                 display: "flex",
@@ -202,7 +204,12 @@ export function VotingRoom({
                 {displayVotes}
               </Box>
             </Box>
-            Average: {calculateAverage()}
+            <Box
+              sx={{
+                m: 1,
+              }}>
+              Average: {calculateAverage()}
+            </Box>
             <Box
               sx={{
                 display: "flex",
@@ -267,7 +274,7 @@ export function VotingRoom({
               )}
             </Box>
           </Grid>
-          <Grid size={3}></Grid>
+          <Grid size={{ xs: 0, md: 4 }}></Grid>
           {/* Footer */}
           <Grid size={12}>
             <Box

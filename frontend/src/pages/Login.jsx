@@ -109,8 +109,8 @@ export function Login({
               Planning Poker Game
             </Typography>
           </Grid>
-          <Grid size={3}></Grid>
-          <Grid size={6}>
+          <Grid size={{ xs: 0, md: 4 }}></Grid>
+          <Grid size={{ xs: 12, md: 4 }}>
             <Box
               component="form"
               ref={formRef}
@@ -201,7 +201,7 @@ export function Login({
               </Box>
             </Box>
           </Grid>
-          <Grid size={3}></Grid>
+          <Grid size={{ xs: 0, md: 4 }}></Grid>
           {/* Footer */}
           <Grid size={12}></Grid>
         </Grid>
