@@ -14,11 +14,13 @@ import { toast } from "react-toastify";
 import { useParams } from "react-router-dom";
 
 export function Login({
+  isPM,
+  setPM,
   isDeveloper,
   setDeveloper,
-  user,
+  setObserver,
+  isObserver,
   setUser,
-  sessionIdVar,
   setSessionIdVar,
 }) {
   const formRef = useRef();
@@ -33,8 +35,18 @@ export function Login({
   const handleDeveloperToggle = (e) => {
     e.preventDefault();
     if (formRef.current.radiogroup.value === "developer") {
+      setPM(false);
       setDeveloper(true);
-    } else {
+      setObserver(false);
+    }
+    if (formRef.current.radiogroup.value === "observer") {
+      setPM(false);
+      setObserver(true);
+      setDeveloper(false);
+    }
+    if (formRef.current.radiogroup.value === "productmanager") {
+      setPM(true);
+      setObserver(false);
       setDeveloper(false);
     }
   };
@@ -54,7 +66,10 @@ export function Login({
     }
 
     //form validation for developer
-    if (form.radiogroup.value === "developer") {
+    if (
+      form.radiogroup.value === "developer" ||
+      form.radiogroup.value === "observer"
+    ) {
       if (!form.username.value.trim()) {
         toast.error(`Username is required!`);
         setInputErrorUsername(true);
@@ -80,7 +95,10 @@ export function Login({
     ]);
 
     // set session Id from input field
-    if (formRef.current.radiogroup.value === "developer") {
+    if (
+      formRef.current.radiogroup.value === "developer" ||
+      formRef.current.radiogroup.value === "observer"
+    ) {
       setSessionIdVar(form.session.value.trim());
     }
 
@@ -92,6 +110,10 @@ export function Login({
     e.preventDefault();
     setInputErrorSessionId(false);
     setInputErrorUsername(false);
+    formRef.current.username.value = "";
+    if (formRef.current.session) {
+      formRef.current.session.value = "";
+    }
   };
 
   return (
@@ -105,7 +127,8 @@ export function Login({
                 textAlign: "center",
               }}
               variant="h2"
-              gutterBottom>
+              gutterBottom
+            >
               Planning Poker Game
             </Typography>
           </Grid>
@@ -128,7 +151,8 @@ export function Login({
                 gap: "10px",
                 border: "1px solid black",
                 padding: "15px",
-              }}>
+              }}
+            >
               <TextField
                 id="username"
                 label="Username"
@@ -137,7 +161,8 @@ export function Login({
                 variant="outlined"
                 type="text"
                 required
-                error={inputErrorUsername}></TextField>
+                error={inputErrorUsername}
+              ></TextField>
               <FormControl>
                 <FormLabel id="demo-radio-buttons-group-label">
                   Set role
@@ -146,11 +171,17 @@ export function Login({
                   aria-labelledby="demo-radio-buttons-group-label"
                   defaultValue="developer"
                   name="radiogroup"
-                  onChange={handleDeveloperToggle}>
+                  onChange={handleDeveloperToggle}
+                >
                   <FormControlLabel
                     value="developer"
                     control={<Radio />}
                     label="Developer"
+                  />
+                  <FormControlLabel
+                    value="observer"
+                    control={<Radio />}
+                    label="Observer"
                   />
                   <FormControlLabel
                     value="productmanager"
@@ -162,7 +193,7 @@ export function Login({
 
               {/* Depending in isDeveloper state, show different form input fields */}
 
-              {isDeveloper ? (
+              {(isDeveloper || isObserver) && (
                 <TextField
                   id="session"
                   label="Session"
@@ -172,8 +203,9 @@ export function Login({
                   type="text"
                   required
                   defaultValue={id}
-                  error={inputErrorSessionId}></TextField>
-              ) : null}
+                  error={inputErrorSessionId}
+                ></TextField>
+              )}
 
               <Box
                 sx={{
@@ -182,20 +214,29 @@ export function Login({
                   gap: "5px",
                   justifyContent: "center",
                   alignItems: "center",
-                }}>
+                }}
+              >
                 <Button
                   variant="contained"
                   type="reset"
-                  onClick={handleResetForm}>
+                  onClick={handleResetForm}
+                >
                   Reset
                 </Button>
-                {isDeveloper ? (
+
+                {isDeveloper && (
                   <Button variant="contained" type="submit">
                     Join Session
                   </Button>
-                ) : (
+                )}
+                {isObserver && (
                   <Button variant="contained" type="submit">
-                    Create new session
+                    Join Session
+                  </Button>
+                )}
+                {isPM && (
+                  <Button variant="contained" type="submit">
+                    Create Session
                   </Button>
                 )}
               </Box>

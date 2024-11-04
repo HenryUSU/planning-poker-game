@@ -171,6 +171,22 @@ io.on("connection", (socket) => {
     }
   });
 
+  //listens to socket from fontent to get observers. Look in the database for current session id and role = observer
+  //emit the observer list to frontend
+  socket.on("getObservers", async (msg) => {
+    console.log(`session id from frontend to get observer: ${msg.sessionId}`);
+    try {
+      const observers = await UserSessionEntry.find({
+        sessionId: msg.sessionId,
+        role: "observer",
+      });
+      console.log(`Observer list from DB of current session: ${observers}`);
+      io.to(msg.sessionId).emit("setObservers", { users: observers });
+    } catch (error) {
+      console.log(`error receving data: ${error}`);
+    }
+  });
+
   //listen to socket with votes from frontend. Update database for current user with vote result and set hasVoted status to true
   //then load updated data from database end emit it to frontend as "updateData"
   socket.on("updateVote", async (msg) => {

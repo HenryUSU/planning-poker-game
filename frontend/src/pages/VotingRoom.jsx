@@ -18,6 +18,8 @@ export function VotingRoom({
   isDeveloper,
   user,
   setUser,
+  isObserver,
+  isPM,
   sessionIdVar,
   setSessionIdVar,
 }) {
@@ -25,6 +27,7 @@ export function VotingRoom({
   // const [hasVoted, setHasVoted] = useState([false]);
   const [votesShow, setVotesShow] = useState(false);
   const [organizer, setOrganizer] = useState("");
+  const [observerList, setObserverList] = useState([]);
   const [showExitPrompt, setShowExitPrompt] = useExitPrompt(true);
 
   const filteredVotes = votes.filter((vote) => vote.role === "developer");
@@ -46,9 +49,19 @@ export function VotingRoom({
         <Votes
           key={vote.userId}
           user={vote.username}
-          voteResult={vote.voteResult}></Votes>
+          voteResult={vote.voteResult}
+        ></Votes>
       );
     }
+  });
+
+  //display observer list
+  const displayObserverList = observerList.map((observer) => {
+    return (
+      <div key={observer.userId}>
+        <div>{observer.username}</div>
+      </div>
+    );
   });
 
   //calculates the average of all votes from developers
@@ -141,6 +154,14 @@ export function VotingRoom({
       setOrganizer(username);
     });
 
+    //get list of observers from backend and update frontend for all users
+    socket.emit("getObservers", {
+      sessionId: sessionIdVar,
+    });
+    socket.on("setObservers", ({ users }) => {
+      setObserverList(users);
+    });
+
     //remove event listener for socketrs
     return () => {
       socket.off("sessionIdGenerated");
@@ -149,8 +170,9 @@ export function VotingRoom({
       socket.off("votesResetted");
       socket.off("votesShown");
       socket.off("setOrganizer");
+      socket.off("setObservers");
     };
-  }, []);
+  }, [user]);
 
   return (
     <Box>
@@ -163,7 +185,8 @@ export function VotingRoom({
                 textAlign: "center",
               }}
               variant="h2"
-              gutterBottom>
+              gutterBottom
+            >
               Planning Poker Game
             </Typography>
           </Grid>
@@ -176,15 +199,18 @@ export function VotingRoom({
                 flexWrap: "wrap",
                 gap: 2,
                 m: 1,
-              }}>
+              }}
+            >
               <Box>Organizer: {organizer}</Box>
               <Box>Current User: {user[0].username}</Box>
+              <Box>Observers: {displayObserverList} </Box>
               <Box>
                 Room Id: {sessionIdVar}{" "}
                 <IconButton
                   color="primary"
                   aria-label="copy sessionId"
-                  onClick={handleCopyToClipboard}>
+                  onClick={handleCopyToClipboard}
+                >
                   <ContentCopyIcon />
                 </IconButton>
               </Box>
@@ -203,7 +229,8 @@ export function VotingRoom({
                 gap: "10px",
                 border: "1px solid black",
                 padding: "15px",
-              }}>
+              }}
+            >
               <Typography variant="h4">Votes</Typography>
               <Box>
                 {/* <Votes user={"Max"} voteResult={"5"}></Votes> */}
@@ -213,7 +240,8 @@ export function VotingRoom({
             <Box
               sx={{
                 m: 1,
-              }}>
+              }}
+            >
               Average: {calculateAverage()}
             </Box>
             <Box
@@ -223,63 +251,82 @@ export function VotingRoom({
                 flexWrap: "wrap",
                 justifyContent: "center",
                 alignItems: "center",
-              }}>
+              }}
+            >
               {" "}
               {/* Show vote buttons if role is developer or show admin buttons if role is productmanager  */}
-              {isDeveloper ? (
+              {isDeveloper && (
                 <Fragment>
                   <VoteButton
                     value={1}
                     imgSource={"./svg/1_card.svg"}
                     sessionIdVar={sessionIdVar}
-                    tooltipText="1 - Low hanging fruit"></VoteButton>
+                    tooltipText="1 - Low hanging fruit"
+                  ></VoteButton>
                   <VoteButton
                     value={2}
                     imgSource={"./svg/2_card.svg"}
                     sessionIdVar={sessionIdVar}
-                    tooltipText="2 - Piece of cake"></VoteButton>
+                    tooltipText="2 - Piece of cake"
+                  ></VoteButton>
                   <VoteButton
                     value={3}
                     imgSource={"./svg/3_card.svg"}
                     sessionIdVar={sessionIdVar}
-                    tooltipText="3 - It Ain’t Rocket Science"></VoteButton>
+                    tooltipText="3 - It Ain’t Rocket Science"
+                  ></VoteButton>
                   <VoteButton
                     value={5}
                     imgSource={"./svg/5_card.svg"}
                     sessionIdVar={sessionIdVar}
-                    tooltipText="5 - Ornitorinco"></VoteButton>
+                    tooltipText="5 - Ornitorinco"
+                  ></VoteButton>
                   <VoteButton
                     value={8}
                     imgSource={"./svg/8_card.svg"}
                     sessionIdVar={sessionIdVar}
-                    tooltipText="8 - An arm and a leg"></VoteButton>
+                    tooltipText="8 - An arm and a leg"
+                  ></VoteButton>
                   <VoteButton
                     value={13}
                     imgSource={"./svg/13_card.svg"}
                     sessionIdVar={sessionIdVar}
-                    tooltipText="13 - Just squeaking by"></VoteButton>
+                    tooltipText="13 - Just squeaking by"
+                  ></VoteButton>
                   <VoteButton
                     value={"∞"}
                     imgSource={"./svg/infinite_card.svg"}
                     sessionIdVar={sessionIdVar}
-                    tooltipText="Infinite - When pigs fly"></VoteButton>
+                    tooltipText="Infinite - When pigs fly"
+                  ></VoteButton>
                   <VoteButton
                     value={"? ? ?"}
                     imgSource={"./svg/question_card.svg"}
                     sessionIdVar={sessionIdVar}
-                    tooltipText="? - Here be dragons!"></VoteButton>
+                    tooltipText="? - Here be dragons!"
+                  ></VoteButton>
                   <VoteButton
                     value={"I need a break!"}
                     imgSource={"./svg/coffee_card.svg"}
                     sessionIdVar={sessionIdVar}
-                    tooltipText="Ping Pong - Coffee break card"></VoteButton>
+                    tooltipText="Ping Pong - Coffee break card"
+                  ></VoteButton>
                 </Fragment>
-              ) : (
+              )}
+              {isPM && (
                 <AdminButtons
                   votesShow={votesShow}
                   setVotesShow={setVotesShow}
-                  sessionIdVar={sessionIdVar}></AdminButtons>
+                  sessionIdVar={sessionIdVar}
+                ></AdminButtons>
               )}
+              {/* (
+                <AdminButtons
+                  votesShow={votesShow}
+                  setVotesShow={setVotesShow}
+                  sessionIdVar={sessionIdVar}
+                ></AdminButtons>
+              ) */}
             </Box>
           </Grid>
           <Grid size={{ xs: 0, md: 4 }}></Grid>
@@ -290,7 +337,8 @@ export function VotingRoom({
                 display: "flex",
                 justifyContent: "center",
                 m: 1,
-              }}>
+              }}
+            >
               {" "}
               Join Session via QR code:
             </Box>
@@ -300,7 +348,8 @@ export function VotingRoom({
                 margin: "0 auto",
                 maxWidth: 128,
                 width: "100%",
-              }}>
+              }}
+            >
               <QRCode
                 size={256}
                 style={{ height: "auto", maxWidth: "100%", width: "100%" }}

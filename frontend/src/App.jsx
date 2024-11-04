@@ -19,7 +19,9 @@ import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 
 function App() {
+  const [isPM, setPM] = useState(false);
   const [isDeveloper, setDeveloper] = useState(true);
+  const [isObserver, setObserver] = useState(false);
   const [user, setUser] = useState([]);
   const [sessionIdVar, setSessionIdVar] = useState("");
   return (
@@ -44,44 +46,69 @@ function App() {
               path="/login"
               element={
                 <Login
+                  isPM={isPM}
+                  setPM={setPM}
                   isDeveloper={isDeveloper}
                   setDeveloper={setDeveloper}
+                  setObserver={setObserver}
+                  isObserver={isObserver}
+                  user={user}
                   setUser={setUser}
                   sessionIdVar={sessionIdVar}
-                  setSessionIdVar={setSessionIdVar}></Login>
-              }></Route>
+                  setSessionIdVar={setSessionIdVar}
+                ></Login>
+              }
+            ></Route>
             <Route
               path="/login/:id"
               element={
                 <Login
+                  isPM={isPM}
+                  setPM={setPM}
                   isDeveloper={isDeveloper}
                   setDeveloper={setDeveloper}
+                  setObserver={setObserver}
+                  isObserver={isObserver}
                   setUser={setUser}
+                  user={user}
                   sessionIdVar={sessionIdVar}
-                  setSessionIdVar={setSessionIdVar}></Login>
-              }></Route>
+                  setSessionIdVar={setSessionIdVar}
+                ></Login>
+              }
+            ></Route>
 
             <Route
               path="/"
               element={
                 <Login
+                  isPM={isPM}
+                  setPM={setPM}
                   isDeveloper={isDeveloper}
                   setDeveloper={setDeveloper}
-                  user={user}
+                  setObserver={setObserver}
+                  isObserver={isObserver}
                   setUser={setUser}
-                  sessionIdVar={sessionIdVar}
-                  setSessionIdVar={setSessionIdVar}></Login>
-              }></Route>
+                  user={user}
+                  setSessionIdVar={setSessionIdVar}
+                ></Login>
+              }
+            ></Route>
             <Route
               path="/session"
               element={
                 <VotingRoom
+                  isPM={isPM}
+                  setPM={setPM}
                   isDeveloper={isDeveloper}
-                  user={user}
                   setUser={setUser}
+                  user={user}
+                  isObserver={isObserver}
+                  setObserver={setObserver}
                   sessionIdVar={sessionIdVar}
-                  setSessionIdVar={setSessionIdVar}></VotingRoom>
-              }></Route>
+                  setSessionIdVar={setSessionIdVar}
+                ></VotingRoom>
+              }
+            ></Route>
           </Routes>
         </BrowserRouter>
       </CssBaseline>
