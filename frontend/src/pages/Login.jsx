@@ -127,9 +127,17 @@ export function Login({
                 textAlign: "center",
               }}
               variant="h2"
-              gutterBottom
             >
               Planning Poker Game
+            </Typography>
+            <Typography
+              sx={{
+                textAlign: "center",
+              }}
+              variant="subtitle1"
+              gutterBottom
+            >
+              v1.0
             </Typography>
           </Grid>
           <Grid size={{ xs: 0, md: 4 }}></Grid>
@@ -217,7 +225,7 @@ export function Login({
                 }}
               >
                 <Button
-                  variant="contained"
+                  variant="outlined"
                   type="reset"
                   onClick={handleResetForm}
                 >

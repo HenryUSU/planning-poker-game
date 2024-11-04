@@ -185,9 +185,17 @@ export function VotingRoom({
                 textAlign: "center",
               }}
               variant="h2"
-              gutterBottom
             >
               Planning Poker Game
+            </Typography>
+            <Typography
+              sx={{
+                textAlign: "center",
+              }}
+              variant="subtitle1"
+              gutterBottom
+            >
+              v1.0
             </Typography>
           </Grid>
           <Grid size={12}>
