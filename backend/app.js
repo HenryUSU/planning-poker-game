@@ -187,6 +187,30 @@ io.on("connection", (socket) => {
     }
   });
 
+  //listen to socket from frontend to check for duplicate users. Look in database for current session id and username
+  //emit duplicate username to frontend
+  socket.on("checkUsername", async (msg) => {
+    console.log(
+      `session id ${msg.sessionId} from frontend to look for duplicate username ${msg.username}`
+    );
+    try {
+      const duplicateUsername = await UserSessionEntry.findOne({
+        sessionId: msg.sessionId,
+        username: msg.username,
+      });
+      if (duplicateUsername) {
+        console.log(
+          `Duplicate username found in DB: username frontend: ${msg.username} matches DB element: ${duplicateUsername}`
+        );
+        socket.emit("UsernameChecked", { foundDuplicateUser: true });
+      } else {
+        socket.emit("UsernameChecked", { foundDuplicateUser: false });
+      }
+    } catch (error) {
+      console.log(`error receving data: ${error}`);
+    }
+  });
+
   //listen to socket with votes from frontend. Update database for current user with vote result and set hasVoted status to true
   //then load updated data from database end emit it to frontend as "updateData"
   socket.on("updateVote", async (msg) => {

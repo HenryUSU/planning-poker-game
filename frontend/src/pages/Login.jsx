@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import { toast } from "react-toastify";
 import { useParams } from "react-router-dom";
+import { socket } from "../components/socket";
 
 export function Login({
   isPM,
@@ -30,6 +31,30 @@ export function Login({
 
   //get session id from URL param
   const { id } = useParams();
+
+  //check if username is already in use for desired session
+  const handleUserNameCheck = (e) => {
+    e.preventDefault();
+    if (
+      formRef.current.username.value.trim() &&
+      formRef.current.session.value.trim()
+    ) {
+      const usernameRef = formRef.current.username.value.trim();
+      const sessionIdRef = formRef.current.session.value.trim();
+      socket.emit("checkUsername", {
+        sessionId: sessionIdRef,
+        username: usernameRef,
+      });
+      socket.on("UsernameChecked", ({ foundDuplicateUser }) => {
+        console.log(`Found duplocate username: ${foundDuplicateUser}`);
+        if (foundDuplicateUser) {
+          toast.error("Username already in use in active session!");
+          setInputErrorUsername(true);
+          return;
+        }
+      });
+    }
+  };
 
   //Depending on selected radiogroup, show different controls in form
   const handleDeveloperToggle = (e) => {
@@ -170,6 +195,7 @@ export function Login({
                 type="text"
                 required
                 error={inputErrorUsername}
+                onChange={handleUserNameCheck}
               ></TextField>
               <FormControl>
                 <FormLabel id="demo-radio-buttons-group-label">
