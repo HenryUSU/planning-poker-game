@@ -213,7 +213,7 @@ export function VotingRoom({
               <Box>Current User: {user[0].username}</Box>
               <Box>Observers: {displayObserverList} </Box>
               <Box>
-                Room Id: {sessionIdVar}{" "}
+                Copy Room ID:
                 <IconButton
                   color="primary"
                   aria-label="copy sessionId"

@@ -28,6 +28,8 @@ export function Login({
   const navigator = useNavigate();
   const [inputErrorUsername, setInputErrorUsername] = useState(false);
   const [inputErrorSessionId, setInputErrorSessionId] = useState(false);
+  const [helperTextUsername, setHelperTextUsername] = useState("");
+  const [helperTextSession, setHelperTextSession] = useState("");
 
   //get session id from URL param
   const { id } = useParams();
@@ -46,11 +48,15 @@ export function Login({
         username: usernameRef,
       });
       socket.on("UsernameChecked", ({ foundDuplicateUser }) => {
-        console.log(`Found duplocate username: ${foundDuplicateUser}`);
+        //console.log(`Found duplicate username: ${foundDuplicateUser}`);
         if (foundDuplicateUser) {
-          toast.error("Username already in use in active session!");
+          // toast.error("Username already in use in active session!");
+          setHelperTextUsername("Username already in use in active session!");
           setInputErrorUsername(true);
           return;
+        } else {
+          setHelperTextUsername("");
+          setInputErrorUsername(false);
         }
       });
     }
@@ -76,6 +82,7 @@ export function Login({
     }
   };
 
+  //checks for submitting the form and proceding to VotingRoom page
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -84,7 +91,8 @@ export function Login({
     //form validation for role productmanager
     if (form.radiogroup.value === "productmanager") {
       if (!form.username.value.trim()) {
-        toast.error(`Username is required!`);
+        //  toast.error(`Username is required!`);
+        setHelperTextUsername("Username is required!");
         setInputErrorUsername(true);
         return;
       }
@@ -96,12 +104,14 @@ export function Login({
       form.radiogroup.value === "observer"
     ) {
       if (!form.username.value.trim()) {
-        toast.error(`Username is required!`);
+        //  toast.error(`Username is required!`);
+        setHelperTextUsername("Username is required!");
         setInputErrorUsername(true);
         return;
       }
       if (!form.session.value.trim()) {
-        toast.error(`Session Id is required!`);
+        // toast.error(`Session Id is required!`);
+        setHelperTextSession("A session ID is required!");
         setInputErrorSessionId(true);
         return;
       }
@@ -111,6 +121,9 @@ export function Login({
     // console.log(`role: ${form.radiogroup.value}`);
 
     //generate userId, get username and role from Textinput
+    if (inputErrorUsername) {
+      return;
+    }
     setUser([
       {
         userId: uuidv4(),
@@ -135,6 +148,8 @@ export function Login({
     e.preventDefault();
     setInputErrorSessionId(false);
     setInputErrorUsername(false);
+    setHelperTextUsername("");
+    setHelperTextSession("");
     formRef.current.username.value = "";
     if (formRef.current.session) {
       formRef.current.session.value = "";
@@ -196,6 +211,7 @@ export function Login({
                 required
                 error={inputErrorUsername}
                 onChange={handleUserNameCheck}
+                helperText={helperTextUsername}
               ></TextField>
               <FormControl>
                 <FormLabel id="demo-radio-buttons-group-label">
@@ -238,6 +254,7 @@ export function Login({
                   required
                   defaultValue={id}
                   error={inputErrorSessionId}
+                  helperText={helperTextSession}
                 ></TextField>
               )}
 

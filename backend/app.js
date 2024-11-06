@@ -36,7 +36,17 @@ const io = new Server(httpServer, {
   // },
 });
 
-mongoose.connect(process.env.MONGO_DB_CLIENT);
+mongoose
+  .connect(process.env.MONGO_DB_CLIENT, {
+    serverSelectionTimeoutMS: 5000,
+    connectTimeoutMS: 10000,
+  })
+  .then(() => {
+    console.log("Connected to MongoDB Atlas");
+  })
+  .catch((err) => {
+    console.error("MongoDB connection error:", err);
+  });
 
 //schema for database
 const userSchema = new mongoose.Schema(
