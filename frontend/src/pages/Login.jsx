@@ -62,6 +62,28 @@ export function Login({
     }
   };
 
+  //check if sessionId exists in backend
+  const handleSessionIdCheck = (e) => {
+    e.preventDefault();
+
+    if (formRef.current.session.value.trim()) {
+      const sessionIdRef = formRef.current.session.value.trim();
+      socket.emit("checkSessionId", {
+        sessionId: sessionIdRef,
+      });
+      socket.on("SessionIdChecked", ({ foundValidSessionId }) => {
+        console.log(`Valid session ID: ${foundValidSessionId}`);
+        if (!foundValidSessionId) {
+          setHelperTextSession("Session ID must be valid!");
+          setInputErrorSessionId(true);
+        } else {
+          setHelperTextSession("");
+          setInputErrorSessionId(false);
+        }
+      });
+    }
+  };
+
   //Depending on selected radiogroup, show different controls in form
   const handleDeveloperToggle = (e) => {
     e.preventDefault();
@@ -121,7 +143,7 @@ export function Login({
     // console.log(`role: ${form.radiogroup.value}`);
 
     //generate userId, get username and role from Textinput
-    if (inputErrorUsername) {
+    if (inputErrorUsername || inputErrorSessionId) {
       return;
     }
     setUser([
@@ -177,7 +199,7 @@ export function Login({
               variant="subtitle1"
               gutterBottom
             >
-              v1.0
+              v1.1 - © Henry Michel
             </Typography>
           </Grid>
           <Grid size={{ xs: 0, md: 4 }}></Grid>
@@ -202,6 +224,10 @@ export function Login({
               }}
             >
               <TextField
+                sx={{
+                  width: "100%",
+                  maxWidth: "350px",
+                }}
                 id="username"
                 label="Username"
                 name="username"
@@ -245,10 +271,15 @@ export function Login({
 
               {(isDeveloper || isObserver) && (
                 <TextField
+                  sx={{
+                    width: "100%",
+                    maxWidth: "350px",
+                  }}
                   id="session"
                   label="Session"
                   name="session"
                   placeholder="Enter Session ID"
+                  onChange={handleSessionIdCheck}
                   variant="outlined"
                   type="text"
                   required

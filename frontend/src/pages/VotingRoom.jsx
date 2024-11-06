@@ -195,7 +195,7 @@ export function VotingRoom({
               variant="subtitle1"
               gutterBottom
             >
-              v1.0
+              v1.1 - © Henry Michel
             </Typography>
           </Grid>
           <Grid size={12}>

@@ -75,7 +75,7 @@ userSchema.path("createdAt").index({ expireAfterSeconds: 1800 });
 const UserSessionEntry = mongoose.model("Poker-Session", userSchema);
 
 app.get("/", (req, res) => {
-  res.send("Hello World!");
+  res.send("Backend has started!");
 });
 
 httpServer.listen(PORT, () => {
@@ -198,7 +198,7 @@ io.on("connection", (socket) => {
   });
 
   //listen to socket from frontend to check for duplicate users. Look in database for current session id and username
-  //emit duplicate username to frontend
+  //emit true/false to frontend
   socket.on("checkUsername", async (msg) => {
     console.log(
       `session id ${msg.sessionId} from frontend to look for duplicate username ${msg.username}`
@@ -215,6 +215,32 @@ io.on("connection", (socket) => {
         socket.emit("UsernameChecked", { foundDuplicateUser: true });
       } else {
         socket.emit("UsernameChecked", { foundDuplicateUser: false });
+      }
+    } catch (error) {
+      console.log(`error receving data: ${error}`);
+    }
+  });
+
+  //listen to socket from frontend to check for valid session id. Look in database for valid session id
+  //emit true/false to frontend
+  socket.on("checkSessionId", async (msg) => {
+    console.log(
+      `session id ${msg.sessionId} from frontend to look for valid session id in DB`
+    );
+    try {
+      const validSessionId = await UserSessionEntry.findOne({
+        sessionId: msg.sessionId,
+      });
+      if (validSessionId) {
+        console.log(
+          `Found valid session ID in Backend. ${msg.sessionId} matches session ID ${validSessionId} in DB`
+        );
+        socket.emit("SessionIdChecked", { foundValidSessionId: true });
+      } else {
+        console.log(
+          `Session ID not found in Backend. ${msg.sessionId} does not matches session ID ${validSessionId} in DB`
+        );
+        socket.emit("SessionIdChecked", { foundValidSessionId: false });
       }
     } catch (error) {
       console.log(`error receving data: ${error}`);
