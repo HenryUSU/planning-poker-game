@@ -296,6 +296,26 @@ io.on("connection", (socket) => {
     }
   });
 
+  //listen to sockets to check backend if every user has voted
+  socket.on("checkHasVoted", async (msg) => {
+    try {
+      const sessionData = await UserSessionEntry.findOne({
+        sessionId: msg.sessionId,
+        role: "developer",
+        hasVoted: false,
+      });
+      if (sessionData) {
+        console.log("not all user have voted");
+        io.to(msg.sessionId).emit("hasVoted", { userHasVoted: false });
+      } else {
+        console.log("All users have voted.");
+        io.to(msg.sessionId).emit("hasVoted", { userHasVoted: true });
+      }
+    } catch (error) {
+      console.log(`Error checking status: ${error}`);
+    }
+  });
+
   //listen to sockets to show votes and emit socket to frontend
   socket.on("showVotes", (msg) => {
     io.to(msg.sessionId).emit("votesShown", {});

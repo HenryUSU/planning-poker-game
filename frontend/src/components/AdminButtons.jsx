@@ -3,8 +3,16 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import { socket } from "../components/socket";
 import { toast } from "react-toastify";
+import { useState } from "react";
 
-export function AdminButtons({ votesShow, setVotesShow, sessionIdVar }) {
+export function AdminButtons({
+  votesShow,
+  setVotesShow,
+  sessionIdVar,
+  buttonDisabled,
+  setButtonDisabled,
+  userMustVote,
+}) {
   //emits message to backend with session id to show votes for all users
   const handleShowVotes = () => {
     socket.emit("showVotes", { sessionId: sessionIdVar });
@@ -16,6 +24,10 @@ export function AdminButtons({ votesShow, setVotesShow, sessionIdVar }) {
   const handleResetVotes = () => {
     socket.emit("resetVote", { sessionId: sessionIdVar });
     toast.success(`Votes resetted!`);
+    if (userMustVote) {
+      setButtonDisabled(true);
+    }
+
     // setVotesShow(false);
   };
   return (
@@ -26,17 +38,21 @@ export function AdminButtons({ votesShow, setVotesShow, sessionIdVar }) {
         alignItems: "center",
         gap: 2,
         m: 2,
-      }}>
+      }}
+    >
       <Button
         onClick={handleShowVotes}
         variant="contained"
-        startIcon={<VisibilityIcon />}>
+        disabled={buttonDisabled}
+        startIcon={<VisibilityIcon />}
+      >
         Show Votes
       </Button>
       <Button
         onClick={handleResetVotes}
         variant="outlined"
-        startIcon={<RestartAltIcon />}>
+        startIcon={<RestartAltIcon />}
+      >
         Reset Votes
       </Button>
     </Box>

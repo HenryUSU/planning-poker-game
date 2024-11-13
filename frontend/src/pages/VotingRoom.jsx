@@ -22,6 +22,8 @@ export function VotingRoom({
   isPM,
   sessionIdVar,
   setSessionIdVar,
+  userMustVote,
+  setUserMustVote,
 }) {
   const [votes, setvotes] = useState([]);
   // const [hasVoted, setHasVoted] = useState([false]);
@@ -29,6 +31,7 @@ export function VotingRoom({
   const [organizer, setOrganizer] = useState("");
   const [observerList, setObserverList] = useState([]);
   const [showExitPrompt, setShowExitPrompt] = useExitPrompt(true);
+  const [buttonDisabled, setButtonDisabled] = useState(userMustVote);
 
   const filteredVotes = votes.filter((vote) => vote.role === "developer");
 
@@ -162,6 +165,19 @@ export function VotingRoom({
       setObserverList(users);
     });
 
+    //check if every user has voted only if userMustVote is true
+    if (userMustVote) {
+      socket.emit("checkHasVoted", { sessionId: sessionIdVar });
+      socket.on("hasVoted", ({ userHasVoted }) => {
+        //  console.log(`have all user voted? ${userHasVoted}`);
+        if (userHasVoted) {
+          setButtonDisabled(false);
+        } else {
+          setButtonDisabled(true);
+        }
+      });
+    }
+
     //remove event listener for socketrs
     return () => {
       socket.off("sessionIdGenerated");
@@ -172,7 +188,7 @@ export function VotingRoom({
       socket.off("setOrganizer");
       socket.off("setObservers");
     };
-  }, [user]);
+  }, [votes]);
 
   return (
     <Box>
@@ -195,7 +211,7 @@ export function VotingRoom({
               variant="subtitle1"
               gutterBottom
             >
-              v1.1 - © Henry Michel
+              v1.2 - © Henry Michel
             </Typography>
           </Grid>
           <Grid size={12}>
@@ -326,6 +342,9 @@ export function VotingRoom({
                   votesShow={votesShow}
                   setVotesShow={setVotesShow}
                   sessionIdVar={sessionIdVar}
+                  buttonDisabled={buttonDisabled}
+                  setButtonDisabled={setButtonDisabled}
+                  userMustVote={userMustVote}
                 ></AdminButtons>
               )}
               {/* (

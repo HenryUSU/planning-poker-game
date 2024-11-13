@@ -13,6 +13,7 @@ import { v4 as uuidv4 } from "uuid";
 import { toast } from "react-toastify";
 import { useParams } from "react-router-dom";
 import { socket } from "../components/socket";
+import Switch from "@mui/material/Switch";
 
 export function Login({
   isPM,
@@ -23,6 +24,8 @@ export function Login({
   isObserver,
   setUser,
   setSessionIdVar,
+  userMustVote,
+  setUserMustVote,
 }) {
   const formRef = useRef();
   const navigator = useNavigate();
@@ -30,6 +33,7 @@ export function Login({
   const [inputErrorSessionId, setInputErrorSessionId] = useState(false);
   const [helperTextUsername, setHelperTextUsername] = useState("");
   const [helperTextSession, setHelperTextSession] = useState("");
+  const [switchState, setSwitchState] = useState(false);
 
   //get session id from URL param
   const { id } = useParams();
@@ -37,9 +41,10 @@ export function Login({
   //check if username is already in use for desired session
   const handleUserNameCheck = (e) => {
     e.preventDefault();
+
     if (
-      formRef.current.username.value.trim() &&
-      formRef.current.session.value.trim()
+      formRef?.current?.username?.value.trim() &&
+      formRef?.current?.session?.value.trim()
     ) {
       const usernameRef = formRef.current.username.value.trim();
       const sessionIdRef = formRef.current.session.value.trim();
@@ -72,7 +77,7 @@ export function Login({
         sessionId: sessionIdRef,
       });
       socket.on("SessionIdChecked", ({ foundValidSessionId }) => {
-        console.log(`Valid session ID: ${foundValidSessionId}`);
+        //  console.log(`Valid session ID: ${foundValidSessionId}`);
         if (!foundValidSessionId) {
           setHelperTextSession("Session ID must be valid!");
           setInputErrorSessionId(true);
@@ -102,6 +107,13 @@ export function Login({
       setObserver(false);
       setDeveloper(false);
     }
+  };
+
+  //set value of switch if users must vote to enable show votes button
+  const handleSwitch = (e) => {
+    setSwitchState(e.target.checked);
+    //  console.log(`Switch value: ${e.target.checked}`);
+    setUserMustVote(e.target.checked);
   };
 
   //checks for submitting the form and proceding to VotingRoom page
@@ -172,6 +184,7 @@ export function Login({
     setInputErrorUsername(false);
     setHelperTextUsername("");
     setHelperTextSession("");
+    setSwitchState(false);
     formRef.current.username.value = "";
     if (formRef.current.session) {
       formRef.current.session.value = "";
@@ -199,7 +212,7 @@ export function Login({
               variant="subtitle1"
               gutterBottom
             >
-              v1.1 - © Henry Michel
+              v1.2 - © Henry Michel
             </Typography>
           </Grid>
           <Grid size={{ xs: 0, md: 4 }}></Grid>
@@ -287,6 +300,18 @@ export function Login({
                   error={inputErrorSessionId}
                   helperText={helperTextSession}
                 ></TextField>
+              )}
+              {isPM && (
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={switchState}
+                      name="switch"
+                      onChange={handleSwitch}
+                    />
+                  }
+                  label="Users must vote to show score"
+                />
               )}
 
               <Box

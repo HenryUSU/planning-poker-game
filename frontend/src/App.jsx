@@ -26,6 +26,7 @@ function App() {
   const [isObserver, setObserver] = useState(false);
   const [user, setUser] = useState([]);
   const [sessionIdVar, setSessionIdVar] = useState("");
+  const [userMustVote, setUserMustVote] = useState(false);
   return (
     <Fragment>
       <CssBaseline>
@@ -59,6 +60,8 @@ function App() {
                     setUser={setUser}
                     sessionIdVar={sessionIdVar}
                     setSessionIdVar={setSessionIdVar}
+                    userMustVote={userMustVote}
+                    setUserMustVote={setUserMustVote}
                   ></Login>
                 }
               ></Route>
@@ -76,6 +79,8 @@ function App() {
                     user={user}
                     sessionIdVar={sessionIdVar}
                     setSessionIdVar={setSessionIdVar}
+                    userMustVote={userMustVote}
+                    setUserMustVote={setUserMustVote}
                   ></Login>
                 }
               ></Route>
@@ -93,6 +98,8 @@ function App() {
                     setUser={setUser}
                     user={user}
                     setSessionIdVar={setSessionIdVar}
+                    userMustVote={userMustVote}
+                    setUserMustVote={setUserMustVote}
                   ></Login>
                 }
               ></Route>
@@ -109,6 +116,8 @@ function App() {
                     setObserver={setObserver}
                     sessionIdVar={sessionIdVar}
                     setSessionIdVar={setSessionIdVar}
+                    userMustVote={userMustVote}
+                    setUserMustVote={setUserMustVote}
                   ></VotingRoom>
                 }
               ></Route>
