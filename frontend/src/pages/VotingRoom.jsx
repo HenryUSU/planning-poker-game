@@ -13,6 +13,7 @@ import IconButton from "@mui/material/IconButton";
 import { toast } from "react-toastify";
 import QRCode from "react-qr-code";
 import useExitPrompt from "../components/useExitPrompt";
+import { VoteCounter } from "../components/VoteCounter";
 
 export function VotingRoom({
   isDeveloper,
@@ -261,13 +262,8 @@ export function VotingRoom({
                 {displayVotes}
               </Box>
             </Box>
-            <Box
-              sx={{
-                m: 1,
-              }}
-            >
-              Average: {calculateAverage()}
-            </Box>
+            <Box>Average: {calculateAverage()}</Box>
+            <VoteCounter votes={votes} votesShow={votesShow} />
             <Box
               sx={{
                 display: "flex",
@@ -316,6 +312,24 @@ export function VotingRoom({
                     imgSource={"./svg/13_card.svg"}
                     sessionIdVar={sessionIdVar}
                     tooltipText="13 - Just squeaking by"
+                  ></VoteButton>
+                  <VoteButton
+                    value={20}
+                    imgSource={"./svg/20_card.svg"}
+                    sessionIdVar={sessionIdVar}
+                    tooltipText="20 - Don’t put all your eggs in one basket"
+                  ></VoteButton>
+                  <VoteButton
+                    value={40}
+                    imgSource={"./svg/40_card.svg"}
+                    sessionIdVar={sessionIdVar}
+                    tooltipText="40 - To step into an aubergine field"
+                  ></VoteButton>
+                  <VoteButton
+                    value={100}
+                    imgSource={"./svg/100_card.svg"}
+                    sessionIdVar={sessionIdVar}
+                    tooltipText="100 - Monster task"
                   ></VoteButton>
                   <VoteButton
                     value={"∞"}
