@@ -1,0 +1,22 @@
+frontend:
+  resources:
+    requests:
+      memory: "500Mi"
+      cpu: ".1"
+    limits:
+      memory: "1Gi"
+      cpu: "1"
+backend:
+  resources:
+    requests:
+      memory: "1Gi"
+      cpu: ".5"
+    limits:
+      memory: "2Gi"
+      cpu: "1"
+ingress:
+  enabled: true
+  ingressClassName: nginx
+  tls:
+    enabled: true
+    secret: planning-poker-tls
