@@ -113,7 +113,7 @@ export function VotingRoom({
   //copy session id incl url to clipbboard
   const handleCopyToClipboard = () => {
     navigator.clipboard.writeText(
-      `${import.meta.env.VITE_FRONTEND_URL}/login/${sessionIdVar}`
+      `${window.origin}/app/login/${sessionIdVar}`
     );
     toast.success(`Session Id copied successfully!`);
   };
@@ -394,9 +394,7 @@ export function VotingRoom({
               <QRCode
                 size={256}
                 style={{ height: "auto", maxWidth: "100%", width: "100%" }}
-                value={`${
-                  import.meta.env.VITE_FRONTEND_URL
-                }/login/${sessionIdVar}`}
+                value={`${window.origin}/app/login/${sessionIdVar}`}
                 viewBox={`0 0 256 256`}
               />
             </Box>

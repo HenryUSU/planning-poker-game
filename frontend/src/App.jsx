@@ -47,7 +47,7 @@ function App() {
             />
             <Routes>
               <Route
-                path="/login"
+                path="/app/login"
                 element={
                   <Login
                     isPM={isPM}
@@ -66,7 +66,7 @@ function App() {
                 }
               ></Route>
               <Route
-                path="/login/:id"
+                path="/app/login/:id"
                 element={
                   <Login
                     isPM={isPM}
@@ -86,7 +86,7 @@ function App() {
               ></Route>
 
               <Route
-                path="/"
+                path="/app/"
                 element={
                   <Login
                     isPM={isPM}
@@ -104,7 +104,7 @@ function App() {
                 }
               ></Route>
               <Route
-                path="/session"
+                path="/app/session"
                 element={
                   <VotingRoom
                     isPM={isPM}
