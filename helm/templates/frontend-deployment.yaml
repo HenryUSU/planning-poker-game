@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      purpose: {{ .Release.Name }}-frontend
+  template:
+    metadata:
+      labels:
+        purpose: {{ .Release.Name }}-frontend
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Release.Name }}-frontend
+          image: "{{ .Values.frontend.image.repository }}:{{ .Values.frontend.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.frontend.image.pullPolicy }}
+#          command: [ "/bin/bash", "-c", "--" ]
+#          args: [ "while true; do sleep 30; done;" ]
+          resources:
+            {{- toYaml .Values.frontend.resources | nindent 12 }}

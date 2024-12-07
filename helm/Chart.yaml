@@ -1,0 +1,14 @@
+apiVersion: v2
+name: planning-poker-service
+description: Helm chart for Henry Michel's Planning Poker Game
+
+type: application
+
+version: 1.0.0
+
+appVersion: "0.1"
+
+dependencies:
+  - name: mongodb
+    version: 16.3.2
+    repository: oci://registry-1.docker.io/bitnamicharts

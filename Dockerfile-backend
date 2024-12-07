@@ -1,0 +1,10 @@
+FROM node:23.3.0-bookworm AS FRONTEND_BUID
+
+RUN mkdir /app
+
+COPY backend /app/backend
+
+WORKDIR /app/backend
+RUN npm install
+
+CMD node app.js

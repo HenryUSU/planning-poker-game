@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-frontend
+  labels:
+    purpose: {{ .Release.Name }}-frontend
+spec:
+  ports:
+  - port: 80
+    targetPort: 80
+    name: http
+  type: {{ default "ClusterIP" .Values.frontend.serviceType }}
+  selector:
+    purpose: {{ .Release.Name }}-frontend

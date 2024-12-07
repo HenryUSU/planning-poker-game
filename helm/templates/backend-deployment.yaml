@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      purpose: {{ .Release.Name }}-backend
+  template:
+    metadata:
+      labels:
+        purpose: {{ .Release.Name }}-backend
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Release.Name }}-backend
+          image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
+#          command: [ "/bin/bash", "-c", "--" ]
+#          args: [ "while true; do sleep 30; done;" ]
+          env:
+            - name: FRONTEND_URL
+              value: {{ .Release.Name }}-frontend
+            - name: MONGO_DB_CLIENT
+              value: mongodb+srv://root:{{ .Values.mongodb.auth.rootPassword }}@{{ .Release.Name }}-mongodb.planning-poker.svc.cluster.local/?retryWrites=true&w=majority&appName=Cluster0&tls=false
+            - name: PORT
+              value: "3000"
+          resources:
+            {{- toYaml .Values.backend.resources | nindent 12 }}

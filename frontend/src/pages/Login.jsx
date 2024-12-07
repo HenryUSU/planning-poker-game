@@ -174,7 +174,7 @@ export function Login({
       setSessionIdVar(form.session.value.trim());
     }
 
-    navigator("/session");
+    navigator("/app/session");
   };
 
   //reset error state from form validation
