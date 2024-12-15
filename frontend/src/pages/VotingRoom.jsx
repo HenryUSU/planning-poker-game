@@ -53,8 +53,7 @@ export function VotingRoom({
         <Votes
           key={vote.userId}
           user={vote.username}
-          voteResult={vote.voteResult}
-        ></Votes>
+          voteResult={vote.voteResult}></Votes>
       );
     }
   });
@@ -76,7 +75,7 @@ export function VotingRoom({
 
     filteredVotes.forEach((vote) => {
       const voteValue = Number(vote.voteResult);
-      if (!isNaN(voteValue) && voteValue >= 0 && voteValue <= 13) {
+      if (!isNaN(voteValue) && voteValue >= 0 && voteValue <= 100) {
         sum += voteValue;
         validVoteCount++;
       }
@@ -112,9 +111,7 @@ export function VotingRoom({
 
   //copy session id incl url to clipbboard
   const handleCopyToClipboard = () => {
-    navigator.clipboard.writeText(
-      `${window.origin}/app/login/${sessionIdVar}`
-    );
+    navigator.clipboard.writeText(`${window.origin}/app/login/${sessionIdVar}`);
     toast.success(`Session Id copied successfully!`);
   };
 
@@ -201,8 +198,7 @@ export function VotingRoom({
               sx={{
                 textAlign: "center",
               }}
-              variant="h2"
-            >
+              variant="h2">
               Planning Poker Game
             </Typography>
             <Typography
@@ -210,8 +206,7 @@ export function VotingRoom({
                 textAlign: "center",
               }}
               variant="subtitle1"
-              gutterBottom
-            >
+              gutterBottom>
               v1.2 - © Henry Michel
             </Typography>
           </Grid>
@@ -224,8 +219,7 @@ export function VotingRoom({
                 flexWrap: "wrap",
                 gap: 2,
                 m: 1,
-              }}
-            >
+              }}>
               <Box>Organizer: {organizer}</Box>
               <Box>Current User: {user[0].username}</Box>
               <Box>Observers: {displayObserverList} </Box>
@@ -234,8 +228,7 @@ export function VotingRoom({
                 <IconButton
                   color="primary"
                   aria-label="copy sessionId"
-                  onClick={handleCopyToClipboard}
-                >
+                  onClick={handleCopyToClipboard}>
                   <ContentCopyIcon />
                 </IconButton>
               </Box>
@@ -254,8 +247,7 @@ export function VotingRoom({
                 gap: "10px",
                 border: "1px solid black",
                 padding: "15px",
-              }}
-            >
+              }}>
               <Typography variant="h4">Votes</Typography>
               <Box>
                 {/* <Votes user={"Max"} voteResult={"5"}></Votes> */}
@@ -271,8 +263,7 @@ export function VotingRoom({
                 flexWrap: "wrap",
                 justifyContent: "center",
                 alignItems: "center",
-              }}
-            >
+              }}>
               {" "}
               {/* Show vote buttons if role is developer or show admin buttons if role is productmanager  */}
               {isDeveloper && (
@@ -281,74 +272,62 @@ export function VotingRoom({
                     value={1}
                     imgSource={"./svg/1_card.svg"}
                     sessionIdVar={sessionIdVar}
-                    tooltipText="1 - Low hanging fruit"
-                  ></VoteButton>
+                    tooltipText="1 - Low hanging fruit"></VoteButton>
                   <VoteButton
                     value={2}
                     imgSource={"./svg/2_card.svg"}
                     sessionIdVar={sessionIdVar}
-                    tooltipText="2 - Piece of cake"
-                  ></VoteButton>
+                    tooltipText="2 - Piece of cake"></VoteButton>
                   <VoteButton
                     value={3}
                     imgSource={"./svg/3_card.svg"}
                     sessionIdVar={sessionIdVar}
-                    tooltipText="3 - It Ain’t Rocket Science"
-                  ></VoteButton>
+                    tooltipText="3 - It Ain’t Rocket Science"></VoteButton>
                   <VoteButton
                     value={5}
                     imgSource={"./svg/5_card.svg"}
                     sessionIdVar={sessionIdVar}
-                    tooltipText="5 - Ornitorinco"
-                  ></VoteButton>
+                    tooltipText="5 - Ornitorinco"></VoteButton>
                   <VoteButton
                     value={8}
                     imgSource={"./svg/8_card.svg"}
                     sessionIdVar={sessionIdVar}
-                    tooltipText="8 - An arm and a leg"
-                  ></VoteButton>
+                    tooltipText="8 - An arm and a leg"></VoteButton>
                   <VoteButton
                     value={13}
                     imgSource={"./svg/13_card.svg"}
                     sessionIdVar={sessionIdVar}
-                    tooltipText="13 - Just squeaking by"
-                  ></VoteButton>
+                    tooltipText="13 - Just squeaking by"></VoteButton>
                   <VoteButton
                     value={20}
                     imgSource={"./svg/20_card.svg"}
                     sessionIdVar={sessionIdVar}
-                    tooltipText="20 - Don’t put all your eggs in one basket"
-                  ></VoteButton>
+                    tooltipText="20 - Don’t put all your eggs in one basket"></VoteButton>
                   <VoteButton
                     value={40}
                     imgSource={"./svg/40_card.svg"}
                     sessionIdVar={sessionIdVar}
-                    tooltipText="40 - To step into an aubergine field"
-                  ></VoteButton>
+                    tooltipText="40 - To step into an aubergine field"></VoteButton>
                   <VoteButton
                     value={100}
                     imgSource={"./svg/100_card.svg"}
                     sessionIdVar={sessionIdVar}
-                    tooltipText="100 - Monster task"
-                  ></VoteButton>
+                    tooltipText="100 - Monster task"></VoteButton>
                   <VoteButton
                     value={"∞"}
                     imgSource={"./svg/infinite_card.svg"}
                     sessionIdVar={sessionIdVar}
-                    tooltipText="Infinite - When pigs fly"
-                  ></VoteButton>
+                    tooltipText="Infinite - When pigs fly"></VoteButton>
                   <VoteButton
                     value={"? ? ?"}
                     imgSource={"./svg/question_card.svg"}
                     sessionIdVar={sessionIdVar}
-                    tooltipText="? - Here be dragons!"
-                  ></VoteButton>
+                    tooltipText="? - Here be dragons!"></VoteButton>
                   <VoteButton
                     value={"I need a break!"}
                     imgSource={"./svg/coffee_card.svg"}
                     sessionIdVar={sessionIdVar}
-                    tooltipText="Ping Pong - Coffee break card"
-                  ></VoteButton>
+                    tooltipText="Ping Pong - Coffee break card"></VoteButton>
                 </Fragment>
               )}
               {isPM && (
@@ -358,8 +337,7 @@ export function VotingRoom({
                   sessionIdVar={sessionIdVar}
                   buttonDisabled={buttonDisabled}
                   setButtonDisabled={setButtonDisabled}
-                  userMustVote={userMustVote}
-                ></AdminButtons>
+                  userMustVote={userMustVote}></AdminButtons>
               )}
               {/* (
                 <AdminButtons
@@ -378,8 +356,7 @@ export function VotingRoom({
                 display: "flex",
                 justifyContent: "center",
                 m: 1,
-              }}
-            >
+              }}>
               {" "}
               Join Session via QR code:
             </Box>
@@ -389,8 +366,7 @@ export function VotingRoom({
                 margin: "0 auto",
                 maxWidth: 128,
                 width: "100%",
-              }}
-            >
+              }}>
               <QRCode
                 size={256}
                 style={{ height: "auto", maxWidth: "100%", width: "100%" }}
