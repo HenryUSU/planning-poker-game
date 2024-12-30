@@ -29,7 +29,9 @@ export function Login({
 }) {
   const formRef = useRef();
   const navigator = useNavigate();
+  const [inputUsername, setInputUsername] = useState("");
   const [inputErrorUsername, setInputErrorUsername] = useState(false);
+  const [inputSessionId, setInputSessionId] = useState("");
   const [inputErrorSessionId, setInputErrorSessionId] = useState(false);
   const [helperTextUsername, setHelperTextUsername] = useState("");
   const [helperTextSession, setHelperTextSession] = useState("");
@@ -37,8 +39,42 @@ export function Login({
 
   //get session id from URL param
   const { id } = useParams();
+  console.log(id);
+
+  //sets username State and check if input is empty
+  //TODO: add logic to check for duplicate usernames in session (from function handleUserNameCheck)
+  const handleUsername = (event) => {
+    const value = event.target.value.trim();
+    setInputUsername(value);
+
+    //Validation logic
+    if (!value) {
+      setHelperTextUsername(`Username must not be empty!`);
+      setInputErrorUsername(true);
+    } else if (id) {
+      socket.emit("checkUsername", {
+        sessionId: id,
+        username: value,
+      });
+      socket.on("UsernameChecked", ({ foundDuplicateUser }) => {
+        //console.log(`Found duplicate username: ${foundDuplicateUser}`);
+        if (foundDuplicateUser) {
+          // toast.error("Username already in use in active session!");
+          setHelperTextUsername("Username already in use in active session!");
+          setInputErrorUsername(true);
+        } else {
+          setHelperTextUsername("");
+          setInputErrorUsername(false);
+        }
+      });
+    } else {
+      setHelperTextUsername("");
+      setInputErrorUsername(false);
+    }
+  };
 
   //check if username is already in use for desired session
+  // logic has to be added to handleUsername function
   const handleUserNameCheck = (e) => {
     e.preventDefault();
 
@@ -64,6 +100,20 @@ export function Login({
           setInputErrorUsername(false);
         }
       });
+    }
+  };
+
+  //check if sessionId is not empty
+  //TODO: add logic to check if sessionId is valid
+  const handleSessionId = (e) => {
+    const value = e.target.value.trim();
+    setInputSessionId(value);
+    if (!value) {
+      setHelperTextSession("Session ID must not be empty!");
+      setInputErrorSessionId(true);
+    } else {
+      setHelperTextSession("");
+      setInputErrorSessionId(false);
     }
   };
 
@@ -186,6 +236,7 @@ export function Login({
     setHelperTextSession("");
     setSwitchState(false);
     formRef.current.username.value = "";
+    setInputUsername("");
     if (formRef.current.session) {
       formRef.current.session.value = "";
     }
@@ -201,8 +252,7 @@ export function Login({
               sx={{
                 textAlign: "center",
               }}
-              variant="h2"
-            >
+              variant="h2">
               Planning Poker Game
             </Typography>
             <Typography
@@ -210,8 +260,7 @@ export function Login({
                 textAlign: "center",
               }}
               variant="subtitle1"
-              gutterBottom
-            >
+              gutterBottom>
               v1.2 - © Henry Michel
             </Typography>
           </Grid>
@@ -234,8 +283,7 @@ export function Login({
                 gap: "10px",
                 border: "1px solid black",
                 padding: "15px",
-              }}
-            >
+              }}>
               <TextField
                 sx={{
                   width: "100%",
@@ -247,11 +295,11 @@ export function Login({
                 placeholder="Enter username"
                 variant="outlined"
                 type="text"
+                value={inputUsername}
                 required
                 error={inputErrorUsername}
-                onChange={handleUserNameCheck}
-                helperText={helperTextUsername}
-              ></TextField>
+                onChange={handleUsername}
+                helperText={helperTextUsername}></TextField>
               <FormControl>
                 <FormLabel id="demo-radio-buttons-group-label">
                   Set role
@@ -260,8 +308,7 @@ export function Login({
                   aria-labelledby="demo-radio-buttons-group-label"
                   defaultValue="developer"
                   name="radiogroup"
-                  onChange={handleDeveloperToggle}
-                >
+                  onChange={handleDeveloperToggle}>
                   <FormControlLabel
                     value="developer"
                     control={<Radio />}
@@ -292,14 +339,15 @@ export function Login({
                   label="Session"
                   name="session"
                   placeholder="Enter Session ID"
-                  onChange={handleSessionIdCheck}
+                  value={id}
+                  onChange={handleSessionId}
                   variant="outlined"
                   type="text"
                   required
-                  defaultValue={id}
+                  // defaultValue={id}
+                  disabled
                   error={inputErrorSessionId}
-                  helperText={helperTextSession}
-                ></TextField>
+                  helperText={helperTextSession}></TextField>
               )}
               {isPM && (
                 <FormControlLabel
@@ -321,13 +369,11 @@ export function Login({
                   gap: "5px",
                   justifyContent: "center",
                   alignItems: "center",
-                }}
-              >
+                }}>
                 <Button
                   variant="outlined"
                   type="reset"
-                  onClick={handleResetForm}
-                >
+                  onClick={handleResetForm}>
                   Reset
                 </Button>
 
