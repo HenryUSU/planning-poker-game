@@ -14,6 +14,7 @@ import { toast } from "react-toastify";
 import { useParams } from "react-router-dom";
 import { socket } from "../components/socket";
 import Switch from "@mui/material/Switch";
+import packageJson from "../../../package.json";
 
 export function Login({
   isPM,
@@ -75,33 +76,33 @@ export function Login({
 
   //check if username is already in use for desired session
   // logic has to be added to handleUsername function
-  const handleUserNameCheck = (e) => {
-    e.preventDefault();
+  // const handleUserNameCheck = (e) => {
+  //   e.preventDefault();
 
-    if (
-      formRef?.current?.username?.value.trim() &&
-      formRef?.current?.session?.value.trim()
-    ) {
-      const usernameRef = formRef.current.username.value.trim();
-      const sessionIdRef = formRef.current.session.value.trim();
-      socket.emit("checkUsername", {
-        sessionId: sessionIdRef,
-        username: usernameRef,
-      });
-      socket.on("UsernameChecked", ({ foundDuplicateUser }) => {
-        //console.log(`Found duplicate username: ${foundDuplicateUser}`);
-        if (foundDuplicateUser) {
-          // toast.error("Username already in use in active session!");
-          setHelperTextUsername("Username already in use in active session!");
-          setInputErrorUsername(true);
-          return;
-        } else {
-          setHelperTextUsername("");
-          setInputErrorUsername(false);
-        }
-      });
-    }
-  };
+  //   if (
+  //     formRef?.current?.username?.value.trim() &&
+  //     formRef?.current?.session?.value.trim()
+  //   ) {
+  //     const usernameRef = formRef.current.username.value.trim();
+  //     const sessionIdRef = formRef.current.session.value.trim();
+  //     socket.emit("checkUsername", {
+  //       sessionId: sessionIdRef,
+  //       username: usernameRef,
+  //     });
+  //     socket.on("UsernameChecked", ({ foundDuplicateUser }) => {
+  //       //console.log(`Found duplicate username: ${foundDuplicateUser}`);
+  //       if (foundDuplicateUser) {
+  //         // toast.error("Username already in use in active session!");
+  //         setHelperTextUsername("Username already in use in active session!");
+  //         setInputErrorUsername(true);
+  //         return;
+  //       } else {
+  //         setHelperTextUsername("");
+  //         setInputErrorUsername(false);
+  //       }
+  //     });
+  //   }
+  // };
 
   //check if sessionId is not empty
   //TODO: add logic to check if sessionId is valid
@@ -261,7 +262,7 @@ export function Login({
               }}
               variant="subtitle1"
               gutterBottom>
-              v1.2 - © Henry Michel
+              version {packageJson.version} - © Henry Michel
             </Typography>
           </Grid>
           <Grid size={{ xs: 0, md: 4 }}></Grid>

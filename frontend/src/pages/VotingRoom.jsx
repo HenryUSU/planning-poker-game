@@ -14,6 +14,7 @@ import { toast } from "react-toastify";
 import QRCode from "react-qr-code";
 import useExitPrompt from "../components/useExitPrompt";
 import { VoteCounter } from "../components/VoteCounter";
+import packageJson from "../../../package.json";
 
 export function VotingRoom({
   isDeveloper,
@@ -207,7 +208,7 @@ export function VotingRoom({
               }}
               variant="subtitle1"
               gutterBottom>
-              v1.2 - © Henry Michel
+              version {packageJson.version} - © Henry Michel
             </Typography>
           </Grid>
           <Grid size={12}>
