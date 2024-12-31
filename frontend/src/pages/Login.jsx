@@ -40,7 +40,6 @@ export function Login({
 
   //get session id from URL param
   const { id } = useParams();
-  console.log(id);
 
   //sets username State and check if input is empty
   //TODO: add logic to check for duplicate usernames in session (from function handleUserNameCheck)
