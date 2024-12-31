@@ -321,6 +321,33 @@ io.on("connection", (socket) => {
     io.to(msg.sessionId).emit("votesShown", {});
   });
 
+  //listen to sockets to kick user from session. Look in database for current session id and user id
+  //delete user from database and load updated data from database end emit it to frontend as "updateData"
+  socket.on("kickUser", async (msg) => {
+    try {
+      const userSocket = io.sockets.sockets.get(msg.socketId);
+      if (userSocket) {
+        userSocket.leave(msg.sessionId);
+      }
+      userSocket.emit("kicked", {
+        message: "You have been removed from the session!",
+      });
+
+      await UserSessionEntry.deleteOne({ userId: msg.userId });
+      console.log(`User with ID ${msg.userId} has been kicked from session`);
+
+      const newSessionData = await UserSessionEntry.find({
+        sessionId: msg.sessionId,
+      });
+
+      io.to(msg.sessionId).emit("updateData", {
+        users: newSessionData,
+      });
+    } catch (error) {
+      console.log(`Error kicking user: ${error}`);
+    }
+  });
+
   //try to remove users who have left the session from database
   socket.on("disconnect", async () => {
     try {

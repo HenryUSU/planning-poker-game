@@ -30,7 +30,7 @@ export const VoteCounter = ({ votes, votesShow }) => {
 
   return (
     <Box>
-      Vote distribution:
+      <b>Vote distribution:</b>
       {renderVoteCounts()}
     </Box>
   );

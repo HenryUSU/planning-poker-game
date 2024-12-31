@@ -14,6 +14,8 @@ import { toast } from "react-toastify";
 import QRCode from "react-qr-code";
 import useExitPrompt from "../components/useExitPrompt";
 import { VoteCounter } from "../components/VoteCounter";
+import { useNavigate } from "react-router-dom";
+
 import packageJson from "../../../package.json";
 
 export function VotingRoom({
@@ -37,16 +39,32 @@ export function VotingRoom({
 
   const filteredVotes = votes.filter((vote) => vote.role === "developer");
 
+  const useNavigator = useNavigate();
+
   //display username and vote. If vote is empty, display ?. If dev has voted, display checkmark. Admin show results via voteshow = true
   const displayVotes = filteredVotes.map((vote) => {
     if (!votesShow) {
       if (vote.hasVoted) {
         return (
-          <Votes key={vote.userId} user={vote.username} voteResult="✔️"></Votes>
+          <Votes
+            key={vote.userId}
+            user={vote.username}
+            voteResult="✔️"
+            userId={vote.userId}
+            sessionIdVar={sessionIdVar}
+            socketId={vote.socketId}
+            isPM={isPM}></Votes>
         );
       } else {
         return (
-          <Votes key={vote.userId} user={vote.username} voteResult="?"></Votes>
+          <Votes
+            key={vote.userId}
+            user={vote.username}
+            voteResult="?"
+            userId={vote.userId}
+            sessionIdVar={sessionIdVar}
+            socketId={vote.socketId}
+            isPM={isPM}></Votes>
         );
       }
     } else {
@@ -54,7 +72,11 @@ export function VotingRoom({
         <Votes
           key={vote.userId}
           user={vote.username}
-          voteResult={vote.voteResult}></Votes>
+          voteResult={vote.voteResult}
+          userId={vote.userId}
+          sessionIdVar={sessionIdVar}
+          socketId={vote.socketId}
+          isPM={isPM}></Votes>
       );
     }
   });
@@ -164,6 +186,12 @@ export function VotingRoom({
       setObserverList(users);
     });
 
+    //reveice event if user is kicked from session
+    socket.on("kicked", ({ message }) => {
+      toast.warn(message);
+      useNavigator("/app/login");
+    });
+
     //check if every user has voted only if userMustVote is true
     if (userMustVote) {
       socket.emit("checkHasVoted", { sessionId: sessionIdVar });
@@ -186,6 +214,7 @@ export function VotingRoom({
       socket.off("votesShown");
       socket.off("setOrganizer");
       socket.off("setObservers");
+      socket.off("kicked");
     };
   }, [votes]);
 
@@ -255,7 +284,10 @@ export function VotingRoom({
                 {displayVotes}
               </Box>
             </Box>
-            <Box>Average: {calculateAverage()}</Box>
+            <Box>
+              {" "}
+              <b>Average:</b> {calculateAverage()}
+            </Box>
             <VoteCounter votes={votes} votesShow={votesShow} />
             <Box
               sx={{
