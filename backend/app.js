@@ -7,6 +7,13 @@ const { type } = require("os");
 const app = express();
 const httpServer = createServer(app);
 const { v4: uuidv4 } = require("uuid");
+const winstonLogger = require("./logging");
+const fs = require("fs");
+const path = require("path");
+
+const logPath = "./logs";
+fs.mkdirSync(logPath, { recursive: true });
+
 require("dotenv").config();
 const PORT = process.env.PORT || 3000;
 
@@ -43,9 +50,14 @@ mongoose
   })
   .then(() => {
     console.log("Connected to MongoDB Atlas");
+    winstonLogger.info("Connected to MongoDB Atlas");
   })
   .catch((err) => {
     console.error("MongoDB connection error:", err);
+    winstonLogger.error({
+      message: "MongoDB connection error",
+      stack: err.stack,
+    });
   });
 
 //schema for database
@@ -84,11 +96,13 @@ httpServer.listen(PORT, () => {
 
 io.on("connection", (socket) => {
   console.log("a user connected with ID" + socket.id);
+  winstonLogger.info(`a user connected with ID ${socket.id}`);
 
   //list to emit from frontend to create a new session id
   socket.on("createSessionId", () => {
     const sessionId = uuidv4();
     console.log(`sessionId generated with Id: ${sessionId}`);
+    winstonLogger.info(`sessionId generated with Id: ${sessionId}`);
     socket.emit("sessionIdGenerated", { sessionId: sessionId });
   });
 
@@ -97,6 +111,9 @@ io.on("connection", (socket) => {
   socket.on("join-room", async (msg) => {
     socket.join(msg.sessionId);
     console.log(
+      `Message received: ${msg.userId}, ${msg.username}, ${msg.sessionId}, ${msg.role}, ${msg.voteResult}`
+    );
+    winstonLogger.info(
       `Message received: ${msg.userId}, ${msg.username}, ${msg.sessionId}, ${msg.role}, ${msg.voteResult}`
     );
 
@@ -124,12 +141,20 @@ io.on("connection", (socket) => {
         });
 
         await newEntry.save();
-        console.log("Message saved to database");
+        console.log("New user saved to database");
+        winstonLogger.info(
+          "New user saved to database: " + JSON.stringify(newEntry)
+        );
 
         const sessionData = await UserSessionEntry.find({
           sessionId: msg.sessionId,
         });
         console.log(`Session Data from DB of current session: ${sessionData}`);
+        winstonLogger.info(
+          `Session Data from DB of current session: ${JSON.stringify(
+            sessionData
+          )}`
+        );
         io.to(msg.sessionId).emit("updateData", {
           users: sessionData,
         });
@@ -160,6 +185,10 @@ io.on("connection", (socket) => {
       // }
     } catch (error) {
       console.log(`error saving message: ${error}`);
+      winstonLogger.error({
+        message: "error saving message:",
+        stack: error.stack,
+      });
     }
   });
 
@@ -167,17 +196,31 @@ io.on("connection", (socket) => {
   //emit the organizer name to frontend
   socket.on("getOrganizer", async (msg) => {
     console.log(`session id from frontend to get organizer: ${msg.sessionId}`);
+    winstonLogger.info(
+      `session id from frontend to get organizer: ${msg.sessionId}`
+    );
     try {
       const organizer = await UserSessionEntry.findOne({
         sessionId: msg.sessionId,
         role: "productmanager",
       });
+
+      if (!organizer) {
+        console.log("No organizer found in database");
+        //  winstonLogger.error("No organizer found in database");
+        return;
+      }
       console.log(`Organizer from database: ${organizer.username}`);
+      winstonLogger.info(`Organizer from database: ${organizer.username}`);
       io.to(msg.sessionId).emit("setOrganizer", {
         username: organizer.username,
       });
     } catch (error) {
       console.log(`error receiving Organizer: ${error}`);
+      winstonLogger.error({
+        message: "error receiving Organizer:",
+        stack: error.stack,
+      });
     }
   });
 
@@ -185,15 +228,25 @@ io.on("connection", (socket) => {
   //emit the observer list to frontend
   socket.on("getObservers", async (msg) => {
     console.log(`session id from frontend to get observer: ${msg.sessionId}`);
+    winstonLogger.info(
+      `session id from frontend to get observer: ${msg.sessionId}`
+    );
     try {
       const observers = await UserSessionEntry.find({
         sessionId: msg.sessionId,
         role: "observer",
       });
       console.log(`Observer list from DB of current session: ${observers}`);
+      winstonLogger.info(
+        `Observer list from DB of current session: ${JSON.stringify(observers)}`
+      );
       io.to(msg.sessionId).emit("setObservers", { users: observers });
     } catch (error) {
       console.log(`error receving data: ${error}`);
+      winstonLogger.error({
+        message: "error receiving data:",
+        stack: error.stack,
+      });
     }
   });
 
@@ -201,6 +254,9 @@ io.on("connection", (socket) => {
   //emit true/false to frontend
   socket.on("checkUsername", async (msg) => {
     console.log(
+      `session id ${msg.sessionId} from frontend to look for duplicate username ${msg.username}`
+    );
+    winstonLogger.info(
       `session id ${msg.sessionId} from frontend to look for duplicate username ${msg.username}`
     );
     try {
@@ -212,12 +268,19 @@ io.on("connection", (socket) => {
         console.log(
           `Duplicate username found in DB: username frontend: ${msg.username} matches DB element: ${duplicateUsername}`
         );
+        winstonLogger.info(
+          `Duplicate username found in DB: username frontend: ${msg.username} matches DB element: ${duplicateUsername}`
+        );
         socket.emit("UsernameChecked", { foundDuplicateUser: true });
       } else {
         socket.emit("UsernameChecked", { foundDuplicateUser: false });
       }
     } catch (error) {
       console.log(`error receving data: ${error}`);
+      winstonLogger.error({
+        message: "error receiving data:",
+        stack: error.stack,
+      });
     }
   });
 
@@ -225,6 +288,9 @@ io.on("connection", (socket) => {
   //emit true/false to frontend
   socket.on("checkSessionId", async (msg) => {
     console.log(
+      `session id ${msg.sessionId} from frontend to look for valid session id in DB`
+    );
+    winstonLogger.info(
       `session id ${msg.sessionId} from frontend to look for valid session id in DB`
     );
     try {
@@ -235,15 +301,25 @@ io.on("connection", (socket) => {
         console.log(
           `Found valid session ID in Backend. ${msg.sessionId} matches session ID ${validSessionId} in DB`
         );
+        winstonLogger.info(
+          `Found valid session ID in Backend. ${msg.sessionId} matches session ID ${validSessionId} in DB`
+        );
         socket.emit("SessionIdChecked", { foundValidSessionId: true });
       } else {
         console.log(
+          `Session ID not found in Backend. ${msg.sessionId} does not matches session ID ${validSessionId} in DB`
+        );
+        winstonLogger.info(
           `Session ID not found in Backend. ${msg.sessionId} does not matches session ID ${validSessionId} in DB`
         );
         socket.emit("SessionIdChecked", { foundValidSessionId: false });
       }
     } catch (error) {
       console.log(`error receving data: ${error}`);
+      winstonLogger.error({
+        message: "error receiving data:",
+        stack: error.stack,
+      });
     }
   });
 
@@ -262,11 +338,18 @@ io.on("connection", (socket) => {
         sessionId: msg.sessionId,
       });
       console.log(`Session Data from DB of current session: ${sessionData}`);
+      winstonLogger.info(
+        `Session Data from DB of current session: ${sessionData}`
+      );
       io.to(msg.sessionId).emit("updateData", {
         users: newSessionData,
       });
     } catch (error) {
       console.log(`error receving data: ${error}`);
+      winstonLogger.error({
+        message: "error receiving data:",
+        stack: error.stack,
+      });
     }
   });
 
@@ -287,12 +370,21 @@ io.on("connection", (socket) => {
         sessionId: msg.sessionId,
       });
       console.log(`Session Data from DB of current session: ${sessionData}`);
+      winstonLogger.info(
+        `Session Data from DB of current session: ${JSON.stringify(
+          sessionData
+        )}`
+      );
       io.to(msg.sessionId).emit("updateData", {
         users: newSessionData,
       });
       io.to(msg.sessionId).emit("votesResetted", {});
     } catch (error) {
       console.log(`Error resetting: ${error}`);
+      winstonLogger.error({
+        message: "Error resetting:",
+        stack: error.stack,
+      });
     }
   });
 
@@ -306,13 +398,19 @@ io.on("connection", (socket) => {
       });
       if (sessionData) {
         console.log("not all user have voted");
+        winstonLogger.info("not all user have voted");
         io.to(msg.sessionId).emit("hasVoted", { userHasVoted: false });
       } else {
         console.log("All users have voted.");
+        winstonLogger.info("All users have voted.");
         io.to(msg.sessionId).emit("hasVoted", { userHasVoted: true });
       }
     } catch (error) {
       console.log(`Error checking status: ${error}`);
+      winstonLogger.error({
+        message: "Error checking status:",
+        stack: error.stack,
+      });
     }
   });
 
@@ -335,6 +433,9 @@ io.on("connection", (socket) => {
 
       await UserSessionEntry.deleteOne({ userId: msg.userId });
       console.log(`User with ID ${msg.userId} has been kicked from session`);
+      winstonLogger.info(
+        `User with ID ${msg.userId} has been kicked from session`
+      );
 
       const newSessionData = await UserSessionEntry.find({
         sessionId: msg.sessionId,
@@ -345,6 +446,10 @@ io.on("connection", (socket) => {
       });
     } catch (error) {
       console.log(`Error kicking user: ${error}`);
+      winstonLogger.error({
+        message: "Error kicking user:",
+        stack: error.stack,
+      });
     }
   });
 
@@ -362,10 +467,15 @@ io.on("connection", (socket) => {
         users: newSessionData,
       });
     } catch (error) {
-      console.log(`error: ${error}`);
+      console.log(`error removing user: ${error}`);
+      winstonLogger.error({
+        message: "Error removing user:",
+        stack: error.stack,
+      });
     }
 
     await UserSessionEntry.deleteOne({ socketId: socket.id });
     console.log(`Client disconnected, deleting id ${socket.id}from DB`);
+    winstonLogger.info(`Client disconnected, deleting id ${socket.id}from DB`);
   });
 });
