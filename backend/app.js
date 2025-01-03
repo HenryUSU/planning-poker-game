@@ -10,6 +10,8 @@ const { v4: uuidv4 } = require("uuid");
 const winstonLogger = require("./logging");
 const fs = require("fs");
 const path = require("path");
+const connectDB = require("./connectDB");
+const UserSessionEntry = require("./models/userSession");
 
 const adminPage = require("./routes/adminPage");
 
@@ -29,6 +31,21 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
+// Error handling middleware
+app.use((err, req, res, next) => {
+  winstonLogger.error({
+    message: err.message,
+    stack: err.stack,
+  });
+  res.status(500).send("Something broke!");
+});
+
+// Add request logging middleware
+app.use((req, res, next) => {
+  winstonLogger.info(`${req.method} ${req.url}`);
+  next();
+});
+
 const io = new Server(httpServer, {
   /* options */
   path: "/api/session/",
@@ -45,53 +62,14 @@ const io = new Server(httpServer, {
   // },
 });
 
-mongoose
-  .connect(process.env.MONGO_DB_CLIENT, {
-    serverSelectionTimeoutMS: 5000,
-    connectTimeoutMS: 10000,
-  })
-  .then(() => {
-    console.log("Connected to MongoDB Atlas");
-    winstonLogger.info("Connected to MongoDB Atlas");
-  })
-  .catch((err) => {
-    console.error("MongoDB connection error:", err);
-    winstonLogger.error({
-      message: "MongoDB connection error",
-      stack: err.stack,
-    });
-  });
-
-//schema for database
-const userSchema = new mongoose.Schema(
-  {
-    sessionId: String,
-    userId: String,
-    socketId: String,
-    username: String,
-    role: String,
-    voteResult: String,
-    hasVoted: {
-      type: Boolean,
-      default: false,
-    },
-    createdAt: {
-      type: Date,
-      default: Date.now,
-    },
-  },
-
-  { timestamps: true }
-);
-
-//in case deletion goes wrong, delete all data after 30 minutes
-userSchema.path("createdAt").index({ expireAfterSeconds: 1800 });
-const UserSessionEntry = mongoose.model("Poker-Session", userSchema);
+// Call the connection function to connect to Mongo DB
+connectDB();
 
 app.get("/", (req, res) => {
   res.send("Backend has started!");
 });
 
+//route to admin page
 app.use("/admin", adminPage);
 
 httpServer.listen(PORT, () => {

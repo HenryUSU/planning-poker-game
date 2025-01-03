@@ -7,10 +7,9 @@ import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
-import { toast } from "react-toastify";
 import { useParams } from "react-router-dom";
 import { socket } from "../components/socket";
 import Switch from "@mui/material/Switch";
@@ -40,6 +39,12 @@ export function Login({
 
   //get session id from URL param
   const { id } = useParams();
+
+  useEffect(() => {
+    if (id) {
+      setInputSessionId(id);
+    }
+  }, [id]);
 
   //sets username State and check if input is empty
   //TODO: add logic to check for duplicate usernames in session (from function handleUserNameCheck)
