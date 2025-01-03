@@ -11,6 +11,8 @@ const winstonLogger = require("./logging");
 const fs = require("fs");
 const path = require("path");
 
+const adminPage = require("./routes/adminPage");
+
 const logPath = "./logs";
 fs.mkdirSync(logPath, { recursive: true });
 
@@ -89,6 +91,8 @@ const UserSessionEntry = mongoose.model("Poker-Session", userSchema);
 app.get("/", (req, res) => {
   res.send("Backend has started!");
 });
+
+app.use("/admin", adminPage);
 
 httpServer.listen(PORT, () => {
   console.log(`Example app listening on PORT ${PORT}`);
