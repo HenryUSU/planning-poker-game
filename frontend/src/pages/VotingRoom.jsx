@@ -1,13 +1,11 @@
+import { Fragment, useState, useCallback, useMemo, useEffect } from "react";
 import Grid from "@mui/material/Grid2";
 import Typography from "@mui/material/Typography";
 import { Box } from "@mui/material";
 import { Votes } from "../components/Votes";
-import { Fragment, useState } from "react";
-import { v4 as uuidv4 } from "uuid";
 import { VoteButton } from "../components/VoteButton";
 import { AdminButtons } from "../components/AdminButtons";
 import { socket } from "../components/socket";
-import { useEffect } from "react";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import IconButton from "@mui/material/IconButton";
 import { toast } from "react-toastify";
@@ -111,11 +109,6 @@ export function VotingRoom({
     }
   };
 
-  //when there is no sessionID, send emit to backend to create one
-  if (!sessionIdVar) {
-    socket.emit("createSessionId", {});
-  }
-
   //new users join a room and emit data to backend
   socket.emit("join-room", {
     sessionId: sessionIdVar,
@@ -132,14 +125,19 @@ export function VotingRoom({
     });
   }
 
-  //copy session id incl url to clipbboard
-  const handleCopyToClipboard = () => {
+  // Callback for clipboard handling
+  const handleCopyToClipboard = useCallback(() => {
     navigator.clipboard.writeText(`${window.origin}/app/login/${sessionIdVar}`);
     toast.success(`Session Id copied successfully!`);
-  };
+  }, [sessionIdVar]);
 
   useEffect(() => {
     socket.connect();
+
+    //when there is no sessionID, send emit to backend to create one
+    if (!sessionIdVar) {
+      socket.emit("createSessionId", {});
+    }
 
     //console.log(`User from frontend: ${user[0].username}`);
 
@@ -215,6 +213,7 @@ export function VotingRoom({
       socket.off("setOrganizer");
       socket.off("setObservers");
       socket.off("kicked");
+      socket.off("disconnect");
     };
   }, [votes]);
 
