@@ -3,6 +3,7 @@ FROM node:23.3.0-bookworm AS build
 RUN mkdir /app
 
 COPY frontend /app/frontend
+COPY package.json /app/package.json
 
 WORKDIR /app/frontend
 RUN npm install
